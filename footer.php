@@ -3,8 +3,6 @@
  * Template Name: Footer
  * 
  * The template for displaying footer.
- * 
- * @package CustomTheme
  */
 ?>
 

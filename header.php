@@ -3,8 +3,6 @@
  * Template Name: Header
  * 
  * The template for displaying header.
- * 
- * @package CustomTheme
  */
 ?>
 <!DOCTYPE html>

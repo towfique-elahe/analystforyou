@@ -1,10 +1,8 @@
 <?php
     /**
-     * Template Name: Functions
+     * File Name: Functions
      * 
      * Theme Functions for CustomTheme
-     * 
-     * @package CustomTheme
      */
 
     // Dynamically load all PHP files in the 'functions' folder.
