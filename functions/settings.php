@@ -69,6 +69,9 @@ function customtheme_advanced_theme_support() {
 
     // Add support for responsive embedded content
     add_theme_support('responsive-embeds');
+
+    // Add support for widgets
+    add_theme_support( 'widgets' );
 }
 add_action('after_setup_theme', 'customtheme_advanced_theme_support');
 
@@ -90,11 +93,6 @@ function customtheme_add_elementor_support() {
     add_theme_support('elementor-custom-breakpoints');
 }
 add_action('after_setup_theme', 'customtheme_add_elementor_support');
-
-
-
-
-
 
 
 /**
@@ -178,3 +176,39 @@ function customtheme_display_menu($theme_location) {
         customtheme_fallback_menu();
     }
 }
+
+/**
+ * Registered widget area
+ */
+function customtheme_widgets_init() {
+    register_sidebar( array(
+        'name'          => __( 'Main Sidebar', 'customtheme' ),
+        'id'            => 'sidebar-1',
+        'description'   => __( 'Widgets in this area will be shown on the sidebar.', 'customtheme' ),
+        'before_widget' => '<section id="%1$s" class="widget %2$s">',
+        'after_widget'  => '</section>',
+        'before_title'  => '<h2 class="widget-title">',
+        'after_title'   => '</h2>',
+    ) );
+}
+add_action( 'widgets_init', 'customtheme_widgets_init' );
+
+/**
+ * Job count from wp job openings plugin [awsm_job_count]
+ */
+function awsm_job_openings_count_shortcode() {
+    $args = array(
+        'post_type'      => 'awsm_job_openings',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'fields'         => 'ids'
+    );
+    
+    $jobs = new WP_Query($args);
+    $count = $jobs->found_posts;
+    
+    wp_reset_postdata();
+    
+    return number_format_i18n($count);
+}
+add_shortcode('awsm_job_count', 'awsm_job_openings_count_shortcode');

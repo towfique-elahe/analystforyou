@@ -20,7 +20,8 @@ function customtheme_register_styles() {
 
     // Enqueue custom CSS files
     $styles = [
-        'customtheme-root-style'          => 'assets/css/root.css',
+        'customtheme-root-style'                => 'assets/css/root.css',
+        'customtheme-wp-job-openings-style'     => 'assets/css/wp-job-openings.css',
     ];
 
     foreach ($styles as $handle => $path) {
