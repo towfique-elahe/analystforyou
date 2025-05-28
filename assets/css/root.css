@@ -9,28 +9,28 @@
 
 :root {
   /* global colors */
-  --primary-color: #1647c5;
+  --primary-color: #205781;
   --secondary-color: #dce6ff;
   --text-color: #585858;
-  --dark-text-color: #222222;
-  --accent-color: #fc7837;
+  --dark-text-color: #050315;
+  --accent-color: #2d88b5;
   --gray-background-color: #fdfdfd;
   --whhite-background-color: #ffffff;
 
   /* global fonts */
-  --primary-font-family: "Alegreya", serif;
+  --primary-font-family: "Outfit", serif;
   --primary-font-size: 54px;
   --primary-font-weight: 700;
 
-  --secondary-font-family: "Alegreya", serif;
+  --secondary-font-family: "Outfit", serif;
   --secondary-font-size: 20px;
   --secondary-font-weight: 700;
 
-  --text-font-family: "Montserrat", sans-serif;
+  --text-font-family: "Inter", sans-serif;
   --text-font-size: 14px;
   --text-font-weight: 500;
 
-  --accent-font-family: "Montserrat", sans-serif;
+  --accent-font-family: "Inter", sans-serif;
   --accent-font-size: 14px;
   --accent-font-weight: 600;
 
@@ -59,4 +59,9 @@
   flex-direction: column;
   flex: 1;
   row-gap: 10px;
+}
+
+a {
+  text-decoration: none;
+  display: inline-block;
 }
