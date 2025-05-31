@@ -21,7 +21,8 @@ function customtheme_register_styles() {
     // Enqueue custom CSS files
     $styles = [
         'customtheme-root-style'                => 'assets/css/root.css',
-        'customtheme-components-style'     => 'assets/css/components.css',
+        'customtheme-job-listings-style'     => 'assets/css/job-listings.css',
+        'customtheme-find-match-style'     => 'assets/css/find-match.css',
     ];
 
     foreach ($styles as $handle => $path) {

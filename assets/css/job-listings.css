@@ -1,0 +1,250 @@
+/* sidebar */
+#jobListing .container {
+  display: flex;
+  gap: 30px;
+}
+#jobListing .sidebar {
+  flex: 1;
+  gap: 20px;
+}
+#jobListing .content {
+  flex: 4;
+}
+#jobListing .sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 5px;
+  border-bottom: var(--border);
+  border-color: var(--accent-color);
+}
+#jobListing .sidebar-heading {
+  color: var(--dark-text-color);
+  font-family: var(--primary-font-family);
+  font-weight: 500;
+  font-size: 24px;
+  margin: 0;
+}
+#jobListing .reset-button {
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  transition: ease 0.3s;
+}
+#jobListing .reset-button:hover {
+  color: var(--accent-color);
+}
+#jobListing .filter-group {
+  padding-bottom: 15px;
+  border-bottom: var(--border);
+}
+#jobListing .filter-group:nth-of-type(2),
+#jobListing .filter-group:last-of-type {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+#jobListing .search {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--accent-color);
+  font-weight: 500;
+  font-size: 18px;
+}
+#jobListing .search ion-icon {
+  margin-left: 13px;
+  margin-right: -30px;
+}
+#jobListing .search input {
+  width: 100%;
+  padding: 10px 15px 10px 40px;
+  background-color: #fff;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 14px;
+  outline: none;
+  border: var(--border);
+  border-radius: 5px;
+}
+#jobListing .search input:focus {
+  border-color: var(--accent-color);
+}
+#jobListing .filter-heading {
+  color: var(--dark-text-color);
+  font-family: var(--primary-font-family);
+  font-weight: 500;
+  font-size: 18px;
+  margin: 0;
+  margin-bottom: 15px;
+}
+#jobListing .filter-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#jobListing .filter-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 14px;
+  cursor: pointer;
+}
+#jobListing .filter-item label {
+  width: 100%;
+}
+
+/* content */
+#jobListing .content-header {
+  border-bottom: var(--border);
+  padding-bottom: 8px;
+  margin-bottom: 10px;
+}
+#jobListing .content-header .col:first-child {
+  justify-content: flex-end;
+}
+#jobListing .content-header .showing-text {
+  margin: 0;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 14px;
+  margin-bottom: 3px;
+}
+#jobListing .content-header .col:last-child .row {
+  justify-content: flex-end;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 14px;
+  gap: 15px;
+}
+#jobListing .content-header .col:last-child select {
+  outline: none;
+  border: var(--border);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--dark-text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 12px;
+}
+#jobListing .content-header .col:last-child select:focus {
+  border-color: var(--accent-color);
+}
+#jobListing .jobs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+#jobListing .job {
+  width: 100%;
+  max-width: calc(33.33% - 13.3px);
+  background-color: #fff;
+  border: var(--border);
+  border-radius: 7px;
+  overflow: hidden;
+  transition: ease 0.3s;
+}
+#jobListing .job:hover {
+  border-color: var(--accent-color);
+}
+#jobListing .job .featured-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+#jobListing .job .body {
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+#jobListing .job h3,
+#jobListing .job p {
+  margin: 0;
+}
+#jobListing .job .title {
+  color: var(--dark-text-color);
+  font-family: var(--primary-font-family);
+  font-weight: 500;
+  font-size: 18px;
+  transition: ease 0.3s;
+}
+#jobListing .job .title:hover {
+  color: var(--accent-color);
+}
+#jobListing .job .skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+#jobListing .job .skill {
+  padding: 5px;
+  border: var(--border);
+  border-radius: 3px;
+  background-color: #e8eff7;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 12px;
+}
+#jobListing .job .specs {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 14px;
+}
+
+/* pagination */
+#jobListing .pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+#jobListing .pagination a {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color);
+  border-radius: 50%;
+  font-family: var(--accent-font-family);
+  font-weight: 400;
+  font-size: 16px;
+  transition: ease .3s;
+}
+#jobListing .pagination .prev,
+#jobListing .pagination .next {
+  width: 50px;
+  height: 50px;
+  background-color: #e7eef7;
+  font-size: 18px;
+}
+#jobListing .pagination .prev {
+  margin-right: 10px;
+}
+#jobListing .pagination .next {
+  margin-left: 10px;
+}
+#jobListing .pagination .prev:hover,
+#jobListing .pagination .next:hover {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+#jobListing .pagination .page:hover,
+#jobListing .pagination .page.active {
+  background-color: var(--accent-color);
+  color: #fff;
+}
