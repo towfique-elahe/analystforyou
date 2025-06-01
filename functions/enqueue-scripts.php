@@ -54,7 +54,7 @@ function customtheme_register_scripts() {
 
     // Enqueue custom JavaScript files
     $scripts = [
-        // 'customtheme-mobile-menu' => 'assets/js/mobile-menu.js',
+        'customtheme-job-listing' => 'assets/js/job-listing.js',
     ];
 
     foreach ($scripts as $handle => $path) {

@@ -7,7 +7,7 @@
   flex: 1;
   gap: 20px;
 }
-#jobListing .content {
+#jobListing .jobs-content {
   flex: 4;
 }
 #jobListing .sidebar-header {
@@ -95,6 +95,9 @@
   font-size: 14px;
   cursor: pointer;
 }
+#jobListing .filter-item input {
+  accent-color: var(--accent-color);
+}
 #jobListing .filter-item label {
   width: 100%;
 }
@@ -138,9 +141,16 @@
   border-color: var(--accent-color);
 }
 #jobListing .jobs {
+  width: 100%;
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+}
+#jobListing .jobs-msg {
+  color: var(--text-color);
+  font-family: var(--accent-font-family);
+  font-weight: 500;
+  font-size: 16px;
 }
 #jobListing .job {
   width: 100%;
@@ -154,7 +164,7 @@
 #jobListing .job:hover {
   border-color: var(--accent-color);
 }
-#jobListing .job .featured-image {
+#jobListing .job img {
   width: 100%;
   height: 200px;
   object-fit: cover;
@@ -223,7 +233,7 @@
   font-family: var(--accent-font-family);
   font-weight: 400;
   font-size: 16px;
-  transition: ease .3s;
+  transition: ease 0.3s;
 }
 #jobListing .pagination .prev,
 #jobListing .pagination .next {

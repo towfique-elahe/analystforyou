@@ -1,191 +1,282 @@
 <?php
-
-// find match section [find_match]
 function render_find_match() {
     ob_start();
 ?>
-
 <div id="findMatch">
-    <!-- categories -->
-    <div class="container categories-container">
-        <h3 class="heading">Select a Category</h3>
-        <p class="sub-heading">Choose the category that best matches your needs</p>
-        <div class="options categories">
-            <a href="javascript:void()" class="option category"><ion-icon name="code-outline"></ion-icon>Software
-                Development</a>
-            <a href="javascript:void()" class="option category"><ion-icon name="server-outline"></ion-icon>Data & AI</a>
-            <a href="javascript:void()" class="option category"><ion-icon name="options-outline"></ion-icon>IT
-                Operations & Infrastructure</a>
-            <a href="javascript:void()" class="option category"><ion-icon
-                    name="shield-outline"></ion-icon>Cybersecurity</a>
-            <a href="javascript:void()" class="option category"><ion-icon name="briefcase-outline"></ion-icon>Project &
-                Business</a>
-            <a href="javascript:void()" class="option category"><ion-icon
-                    name="checkmark-circle-outline"></ion-icon>Testing & Quality Assurance</a>
-            <a href="javascript:void()" class="option category"><ion-icon name="globe-outline"></ion-icon>Web &
-                Design</a>
+    <!-- Specialization -->
+    <div class="container specialization-container">
+        <h3 class="heading">Select a Specialization</h3>
+        <p class="sub-heading">Choose the general role you're looking for</p>
+        <div class="options specialization">
+            <a href="javascript:void()" class="option specialization">Data Analyst</a>
+            <a href="javascript:void()" class="option specialization">Business Analyst</a>
+            <a href="javascript:void()" class="option specialization">BI Specialist</a>
+            <a href="javascript:void()" class="option specialization">Data Scientist</a>
+            <a href="javascript:void()" class="option specialization">Data Engineer</a>
+            <a href="javascript:void()" class="option specialization">Information Analyst</a>
         </div>
     </div>
 
-    <!-- roles -->
-    <div class="container roles-container">
-        <h3 class="heading">Select a Role</h3>
-        <p class="sub-heading">Choose the role you're looking for</p>
-        <div class="options roles">
-            <a href="javascript:void()" class="option role"><ion-icon name="code-working-outline"></ion-icon>Fullstack
-                Developer</a>
-            <a href="javascript:void()" class="option role"><ion-icon name="server-outline"></ion-icon>Backend
-                Developer</a>
-            <a href="javascript:void()" class="option role"><ion-icon name="color-palette-outline"></ion-icon>Frontend
-                Developer</a>
-            <a href="javascript:void()" class="option role"><ion-icon name="apps-outline"></ion-icon>Mobile Developer
-                (Flutter, React Native, iOS, Android)</a>
-            <a href="javascript:void()" class="option role"><ion-icon name="settings-outline"></ion-icon>DevOps
-                Engineer</a>
-            <a href="javascript:void()" class="option role"><ion-icon name="layers-outline"></ion-icon>Software
-                Architect / Tech Lead</a>
-            <a href="javascript:void()" class="option role"><ion-icon name="hardware-chip-outline"></ion-icon>Embedded
-                Software Engineer</a>
-        </div>
-        <button class="back-button">Back</button>
+    <!-- Sub Role -->
+    <div class="container subrole-container">
+        <h3 class="heading">Select a Sub Role</h3>
+        <p class="sub-heading">Refine the role with a more specific specialization</p>
+        <div class="options subrole"></div>
+        <button class="button back-button">Back</button>
     </div>
 
-    <!-- experiences -->
-    <div class="container experiences-container">
+    <!-- Languages & Tools -->
+    <div class="container tools-container">
+        <h3 class="heading">Select Languages & Tools</h3>
+        <p class="sub-heading">Select one or more technical skills or tools</p>
+        <div class="options tools multi-select">
+            <?php
+            $tools = ["SQL", "Python", "R", "Power BI", "Tableau", "Excel", "Google Data Studio", "scikit-learn", "TensorFlow", "Apache Airflow", "Snowflake", "Azure / AWS / GCP", "Git"];
+            foreach ($tools as $tool) {
+                echo "<a href='javascript:void()' class='option tool'>$tool</a>";
+            }
+            ?>
+        </div>
+        <button class="button back-button">Back</button>
+    </div>
+
+    <!-- Experience -->
+    <div class="container experience-container">
         <h3 class="heading">Select Experience Level</h3>
-        <p class="sub-heading">Choose the experience level you're looking for</p>
-        <div class="options experiences">
-            <a href="javascript:void()" class="option experience"><ion-icon name="sparkles-outline"></ion-icon>Junior
-                (0-2 years)</a>
-            <a href="javascript:void()" class="option experience"><ion-icon name="trending-up-outline"></ion-icon>Medior
-                (2-5 years)</a>
-            <a href="javascript:void()" class="option experience"><ion-icon name="trophy-outline"></ion-icon>Senior (5+
-                years)</a>
+        <p class="sub-heading">Choose the desired experience range</p>
+        <div class="options experience">
+            <a href="javascript:void()" class="option experience">Junior (0–2 years)</a>
+            <a href="javascript:void()" class="option experience">Mid-level (3–5 years)</a>
+            <a href="javascript:void()" class="option experience">Senior (6+ years)</a>
         </div>
-        <button class="back-button">Back</button>
+        <button class="button back-button">Back</button>
     </div>
 
-    <!-- availabilities -->
-    <div class="container availabilities-container">
-        <h3 class="heading">Choose Your Availability</h3>
-        <p class="sub-heading">Select the availability type you're looking for</p>
-        <div class="options availabilities">
-            <a href="javascript:void()" class="option availability"><ion-icon
-                    name="briefcase-outline"></ion-icon>Freelancer</a>
-            <a href="javascript:void()" class="option availability"><ion-icon
-                    name="time-outline"></ion-icon>Part-time</a>
-            <a href="javascript:void()" class="option availability"><ion-icon
-                    name="hourglass-outline"></ion-icon>Full-time</a>
-            <a href="javascript:void()" class="option availability"><ion-icon
-                    name="swap-horizontal-outline"></ion-icon>Open to both freelance and employment</a>
+    <!-- Availability -->
+    <div class="container availability-container">
+        <h3 class="heading">Select Availability</h3>
+        <p class="sub-heading">Select the type of availability the candidate is looking for</p>
+        <div class="options availability">
+            <a href="javascript:void()" class="option availability">Full-time</a>
+            <a href="javascript:void()" class="option availability">Part-time</a>
+            <a href="javascript:void()" class="option availability">Freelancer</a>
+            <a href="javascript:void()" class="option availability">Traineeship</a>
+            <a href="javascript:void()" class="option availability">Internship</a>
         </div>
-        <button class="back-button">Back</button>
+        <button class="button back-button">Back</button>
     </div>
 
-    <!-- industries -->
-    <div class="container industries-container">
-        <h3 class="heading">Select Industry</h3>
-        <p class="sub-heading">Choose the industry you're targeting</p>
-        <div class="options industries">
-            <a href="javascript:void()" class="option industry"><ion-icon name="card-outline"></ion-icon>Financial
-                Services</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="medkit-outline"></ion-icon>Healthcare &
-                Medical</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="cart-outline"></ion-icon>E-Commerce &
-                Retail</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="cube-outline"></ion-icon>Logistics &
-                Supply Chain</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="business-outline"></ion-icon>Government
-                & Public Sector</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="wifi-outline"></ion-icon>Telecom & IT
-                Services</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="school-outline"></ion-icon>Education &
-                Research</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="flash-outline"></ion-icon>Energy &
-                Utilities</a>
-            <a href="javascript:void()" class="option industry"><ion-icon
-                    name="construct-outline"></ion-icon>Manufacturing & Industry</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="home-outline"></ion-icon>Real Estate &
-                Construction</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="megaphone-outline"></ion-icon>Media &
-                Marketing</a>
-            <a href="javascript:void()" class="option industry"><ion-icon name="heart-outline"></ion-icon>Non-profit &
-                NGOs</a>
+    <!-- Sector -->
+    <div class="container sector-container">
+        <h3 class="heading">Select Sector</h3>
+        <p class="sub-heading">Select industry experience or preference</p>
+        <div class="options sector">
+            <a href="javascript:void()" class="option sector">Finance</a>
+            <a href="javascript:void()" class="option sector">Healthcare</a>
+            <a href="javascript:void()" class="option sector">Government</a>
+            <a href="javascript:void()" class="option sector">Retail & E-commerce</a>
+            <a href="javascript:void()" class="option sector">Logistics</a>
+            <a href="javascript:void()" class="option sector">Technology & IT</a>
+            <a href="javascript:void()" class="option sector">Energy</a>
+            <a href="javascript:void()" class="option sector">Education</a>
+            <a href="javascript:void()" class="option sector">Consulting</a>
+            <a href="javascript:void()" class="option sector">Other / Not Relevant</a>
         </div>
-        <button class="back-button">Back</button>
+        <button class="button back-button">Back</button>
+    </div>
+
+    <!-- Loading -->
+    <div class="container loading-container">
+        <h3 class="heading">Finding your match...</h3>
+    </div>
+
+    <!-- Matches -->
+    <div class="container match-container">
+        <h3 class="heading">3 Matches Found</h3>
+        <div class="match-cards">
+            <?php for ($i = 1; $i <= 3; $i++): ?>
+            <div class="col card">
+                <div class="row head">
+                    <div class="col">
+                        <img src="<?php echo get_template_directory_uri(); ?>/assets/media/user.png" alt="User"
+                            class="image">
+                    </div>
+                    <div class="col">
+                        <h4 class="name">Candidate
+                            <?= $i ?>
+                        </h4>
+                        <p class="specialization">BI Specialist</p>
+                        <div class="flags">
+                            🇺🇸 🇳🇱
+                        </div>
+                    </div>
+                </div>
+                <div class="body">
+                    <div class="tools">
+                        <span class="tool">Power BI</span>
+                        <span class="tool">SQL</span>
+                        <span class="tool">Excel</span>
+                    </div>
+                    <p class="bio">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Veniam, quibusdam!</p>
+                    <p><strong>Sub Role:</strong> Power BI Specialist</p>
+                    <p><strong>Experience:</strong> Mid-level (3–5 years)</p>
+                    <p><strong>Availability:</strong> Full-time</p>
+                    <p><strong>Sector:</strong> Finance</p>
+                </div>
+                <div class="footer">
+                    <button class="button">Contact Now</button>
+                </div>
+            </div>
+            <?php endfor; ?>
+        </div>
     </div>
 </div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const steps = [
-            ".categories-container",
-            ".roles-container",
-            ".experiences-container",
-            ".availabilities-container",
-            ".industries-container"
+            ".specialization-container",
+            ".subrole-container",
+            ".tools-container",
+            ".experience-container",
+            ".availability-container",
+            ".sector-container",
+            ".loading-container",
+            ".match-container"
         ];
 
+        const subrolesMap = {
+            "Data Analyst": ["Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
+                "Financial Data Analyst", "Operations Analyst", "Supply Chain Analyst",
+                "Statistical Analyst"
+            ],
+            "Business Analyst": ["Process Analyst", "Change Analyst", "Functional Business Analyst",
+                "Business Process Analyst"
+            ],
+            "BI Specialist": ["BI Analyst", "BI Developer", "Power BI Specialist", "Tableau Specialist",
+                "Dashboard Specialist", "Data Visualization Specialist"
+            ],
+            "Data Scientist": ["Predictive Analytics Specialist", "Machine Learning Engineer", "AI Engineer",
+                "NLP Specialist", "Quantitative Analyst"
+            ],
+            "Data Engineer": ["ETL Developer", "Analytics Engineer", "Data Platform Engineer",
+                "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
+            ],
+            "Information Analyst": ["Functional Analyst", "Technical Analyst", "Systems Analyst",
+                "Application Analyst", "Requirements Analyst"
+            ]
+        };
+
         let currentStep = 0;
-        const selections = {};
+        const selections = {
+            tools: []
+        };
 
         function showStep(index) {
             steps.forEach((step, i) => {
                 const el = document.querySelector(step);
-                if (el) {
-                    el.classList.toggle('active', i === index);
-                    if (i === index) {
-                        const stepKey = step.replace('.', '').replace('-container', '');
-                        const selectedValue = selections[stepKey];
+                if (el) el.classList.toggle('active', i === index);
+            });
 
-                        if (selectedValue) {
-                            // Highlight the previously selected option
-                            el.querySelectorAll(".option").forEach(option => {
-                                const text = option.textContent.trim();
-                                if (text === selectedValue) {
-                                    option.classList.add("selected");
-                                } else {
-                                    option.classList.remove("selected");
-                                }
-                            });
-                        }
-                    }
+            const stepKey = steps[index].replace('.', '').replace('-container', '');
+            highlightSelectedOptions(stepKey);
+
+            if (steps[index] === ".loading-container") {
+                setTimeout(() => {
+                    currentStep++;
+                    showStep(currentStep);
+                }, 2000);
+            }
+        }
+
+        function highlightSelectedOptions(key) {
+            const container = document.querySelector(`.${key}-container`);
+            if (!container) return;
+
+            container.querySelectorAll(".option").forEach(option => {
+                const val = option.textContent.trim();
+                if (key === "tools") {
+                    option.classList.toggle("selected", selections.tools.includes(val));
+                } else {
+                    option.classList.toggle("selected", selections[key] === val);
                 }
             });
         }
 
-        showStep(currentStep); // Initial render
+        function goToNextStep() {
+            currentStep++;
+            showStep(currentStep);
+        }
 
+        showStep(currentStep);
+
+        document.querySelectorAll(".specialization-container .option").forEach(option => {
+            option.addEventListener("click", function () {
+                selections.specialization = this.textContent.trim();
+
+                const subroleContainer = document.querySelector(".subrole");
+                subroleContainer.innerHTML = subrolesMap[selections.specialization]
+                    .map(role => `<a href="javascript:void()" class="option subrole">${role}</a>`)
+                    .join("");
+
+                goToNextStep();
+
+                setTimeout(() => {
+                    document.querySelectorAll(".subrole-container .option").forEach(
+                        subrole => {
+                            subrole.addEventListener("click", function () {
+                                selections.subrole = this.textContent.trim();
+                                goToNextStep();
+                            });
+                        });
+                }, 100);
+            });
+        });
+
+        // Handle Tools multi-select
+        document.querySelectorAll(".tools-container .option").forEach(option => {
+            option.addEventListener("click", function () {
+                const val = this.textContent.trim();
+                if (selections.tools.includes(val)) {
+                    selections.tools = selections.tools.filter(t => t !== val);
+                    this.classList.remove("selected");
+                } else {
+                    selections.tools.push(val);
+                    this.classList.add("selected");
+                }
+            });
+        });
+
+        // Add a "Next" button for tools step
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Next";
+        nextButton.className = "button next-button";
+        nextButton.addEventListener("click", function () {
+            goToNextStep();
+        });
+        document.querySelector(".tools-container").appendChild(nextButton);
+
+        // Handle generic steps
         steps.forEach((step, index) => {
             const container = document.querySelector(step);
             if (!container) return;
 
-            container.querySelectorAll(".option").forEach(option => {
+            const options = container.querySelectorAll(
+                ".option:not(.tool):not(.subrole):not(.specialization)");
+            options.forEach(option => {
                 option.addEventListener("click", function () {
-                    const value = option.textContent.trim();
-                    const stepKey = step.replace('.', '').replace('-container', '');
-
-                    selections[stepKey] = value;
-                    console.log(selections);
-
-                    option.classList.add("selected");
-
-                    if (index + 1 < steps.length) {
-                        currentStep = index + 1;
-                        showStep(currentStep);
-                    } else {
-                        alert("All steps completed!");
-                        // AJAX submission can happen here
-                        // Example: sendSelectionsToServer(selections);
-                    }
+                    const val = this.textContent.trim();
+                    const key = step.replace('.', '').replace('-container', '');
+                    selections[key] = val;
+                    goToNextStep();
                 });
             });
 
             const backButton = container.querySelector(".back-button");
             if (backButton) {
                 backButton.addEventListener("click", function () {
-                    if (index > 0) {
-                        currentStep = index - 1;
+                    if (currentStep > 0) {
+                        currentStep--;
                         showStep(currentStep);
                     }
                 });
