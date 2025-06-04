@@ -85,6 +85,30 @@ function render_find_match() {
         <button class="button back-button">Back</button>
     </div>
 
+    <!-- Recruiter -->
+    <div class="container recruiter-container">
+        <h3 class="heading">Your Details</h3>
+        <p class="sub-heading">Please provide your contact information</p>
+        <form class="form recruiter-form">
+            <div class="form-group">
+                <label for="recruiter-name">Your Name</label>
+                <input type="text" id="recruiter-name" name="recruiter-name" placeholder="Enter your full name">
+            </div>
+            <div class="form-group">
+                <label for="recruiter-email">Your Email</label>
+                <input type="email" id="recruiter-email" name="recruiter-email" placeholder="Enter your email address">
+            </div>
+            <div class="form-group">
+                <label for="recruiter-phone">Your Phone</label>
+                <input type="tel" id="recruiter-phone" name="recruiter-phone" placeholder="Enter your phone number">
+            </div>
+            <div class="button-group">
+                <button type="button" class="button back-button">Back</button>
+                <button type="button" class="button find-button">Find My Match</button>
+            </div>
+        </form>
+    </div>
+
     <!-- Loading -->
     <div class="container loading-container">
         <h3 class="heading">Finding your match...</h3>
@@ -133,156 +157,175 @@ function render_find_match() {
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const steps = [
-            ".specialization-container",
-            ".subrole-container",
-            ".tools-container",
-            ".experience-container",
-            ".availability-container",
-            ".sector-container",
-            ".loading-container",
-            ".match-container"
-        ];
+document.addEventListener("DOMContentLoaded", function() {
+    const steps = [
+        ".specialization-container",
+        ".subrole-container",
+        ".tools-container",
+        ".experience-container",
+        ".availability-container",
+        ".sector-container",
+        ".recruiter-container",
+        ".loading-container",
+        ".match-container"
+    ];
 
-        const subrolesMap = {
-            "Data Analyst": ["Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
-                "Financial Data Analyst", "Operations Analyst", "Supply Chain Analyst",
-                "Statistical Analyst"
-            ],
-            "Business Analyst": ["Process Analyst", "Change Analyst", "Functional Business Analyst",
-                "Business Process Analyst"
-            ],
-            "BI Specialist": ["BI Analyst", "BI Developer", "Power BI Specialist", "Tableau Specialist",
-                "Dashboard Specialist", "Data Visualization Specialist"
-            ],
-            "Data Scientist": ["Predictive Analytics Specialist", "Machine Learning Engineer", "AI Engineer",
-                "NLP Specialist", "Quantitative Analyst"
-            ],
-            "Data Engineer": ["ETL Developer", "Analytics Engineer", "Data Platform Engineer",
-                "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
-            ],
-            "Information Analyst": ["Functional Analyst", "Technical Analyst", "Systems Analyst",
-                "Application Analyst", "Requirements Analyst"
-            ]
-        };
+    const subrolesMap = {
+        "Data Analyst": ["Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
+            "Financial Data Analyst", "Operations Analyst", "Supply Chain Analyst",
+            "Statistical Analyst"
+        ],
+        "Business Analyst": ["Process Analyst", "Change Analyst", "Functional Business Analyst",
+            "Business Process Analyst"
+        ],
+        "BI Specialist": ["BI Analyst", "BI Developer", "Power BI Specialist", "Tableau Specialist",
+            "Dashboard Specialist", "Data Visualization Specialist"
+        ],
+        "Data Scientist": ["Predictive Analytics Specialist", "Machine Learning Engineer", "AI Engineer",
+            "NLP Specialist", "Quantitative Analyst"
+        ],
+        "Data Engineer": ["ETL Developer", "Analytics Engineer", "Data Platform Engineer",
+            "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
+        ],
+        "Information Analyst": ["Functional Analyst", "Technical Analyst", "Systems Analyst",
+            "Application Analyst", "Requirements Analyst"
+        ]
+    };
 
-        let currentStep = 0;
-        const selections = {
-            tools: []
-        };
+    let currentStep = 0;
+    const selections = {
+        tools: []
+    };
 
-        function showStep(index) {
-            steps.forEach((step, i) => {
-                const el = document.querySelector(step);
-                if (el) el.classList.toggle('active', i === index);
-            });
+    function showStep(index) {
+        steps.forEach((step, i) => {
+            const el = document.querySelector(step);
+            if (el) el.classList.toggle('active', i === index);
+        });
 
-            const stepKey = steps[index].replace('.', '').replace('-container', '');
-            highlightSelectedOptions(stepKey);
+        const stepKey = steps[index].replace('.', '').replace('-container', '');
+        highlightSelectedOptions(stepKey);
 
-            if (steps[index] === ".loading-container") {
-                setTimeout(() => {
-                    currentStep++;
-                    showStep(currentStep);
-                }, 2000);
+        if (steps[index] === ".loading-container") {
+            setTimeout(() => {
+                currentStep++;
+                showStep(currentStep);
+            }, 2000);
+        }
+    }
+
+    function highlightSelectedOptions(key) {
+        const container = document.querySelector(`.${key}-container`);
+        if (!container) return;
+
+        container.querySelectorAll(".option").forEach(option => {
+            const val = option.textContent.trim();
+            if (key === "tools") {
+                option.classList.toggle("selected", selections.tools.includes(val));
+            } else {
+                option.classList.toggle("selected", selections[key] === val);
             }
-        }
+        });
+    }
 
-        function highlightSelectedOptions(key) {
-            const container = document.querySelector(`.${key}-container`);
-            if (!container) return;
-
-            container.querySelectorAll(".option").forEach(option => {
-                const val = option.textContent.trim();
-                if (key === "tools") {
-                    option.classList.toggle("selected", selections.tools.includes(val));
-                } else {
-                    option.classList.toggle("selected", selections[key] === val);
-                }
-            });
-        }
-
-        function goToNextStep() {
-            currentStep++;
-            showStep(currentStep);
-        }
-
+    function goToNextStep() {
+        currentStep++;
         showStep(currentStep);
+    }
 
-        document.querySelectorAll(".specialization-container .option").forEach(option => {
-            option.addEventListener("click", function () {
-                selections.specialization = this.textContent.trim();
+    showStep(currentStep);
 
-                const subroleContainer = document.querySelector(".subrole");
-                subroleContainer.innerHTML = subrolesMap[selections.specialization]
-                    .map(role => `<a href="javascript:void()" class="option subrole">${role}</a>`)
-                    .join("");
+    document.querySelectorAll(".specialization-container .option").forEach(option => {
+        option.addEventListener("click", function() {
+            selections.specialization = this.textContent.trim();
 
-                goToNextStep();
+            const subroleContainer = document.querySelector(".subrole");
+            subroleContainer.innerHTML = subrolesMap[selections.specialization]
+                .map(role => `<a href="javascript:void()" class="option subrole">${role}</a>`)
+                .join("");
 
-                setTimeout(() => {
-                    document.querySelectorAll(".subrole-container .option").forEach(
-                        subrole => {
-                            subrole.addEventListener("click", function () {
-                                selections.subrole = this.textContent.trim();
-                                goToNextStep();
-                            });
-                        });
-                }, 100);
-            });
-        });
-
-        // Handle Tools multi-select
-        document.querySelectorAll(".tools-container .option").forEach(option => {
-            option.addEventListener("click", function () {
-                const val = this.textContent.trim();
-                if (selections.tools.includes(val)) {
-                    selections.tools = selections.tools.filter(t => t !== val);
-                    this.classList.remove("selected");
-                } else {
-                    selections.tools.push(val);
-                    this.classList.add("selected");
-                }
-            });
-        });
-
-        // Add a "Next" button for tools step
-        const nextButton = document.createElement("button");
-        nextButton.textContent = "Next";
-        nextButton.className = "button next-button";
-        nextButton.addEventListener("click", function () {
             goToNextStep();
+
+            setTimeout(() => {
+                document.querySelectorAll(".subrole-container .option").forEach(
+                    subrole => {
+                        subrole.addEventListener("click", function() {
+                            selections.subrole = this.textContent.trim();
+                            goToNextStep();
+                        });
+                    });
+            }, 100);
         });
-        document.querySelector(".tools-container").appendChild(nextButton);
+    });
 
-        // Handle generic steps
-        steps.forEach((step, index) => {
-            const container = document.querySelector(step);
-            if (!container) return;
-
-            const options = container.querySelectorAll(
-                ".option:not(.tool):not(.subrole):not(.specialization)");
-            options.forEach(option => {
-                option.addEventListener("click", function () {
-                    const val = this.textContent.trim();
-                    const key = step.replace('.', '').replace('-container', '');
-                    selections[key] = val;
-                    goToNextStep();
-                });
-            });
-
-            const backButton = container.querySelector(".back-button");
-            if (backButton) {
-                backButton.addEventListener("click", function () {
-                    if (currentStep > 0) {
-                        currentStep--;
-                        showStep(currentStep);
-                    }
-                });
+    // Handle Tools multi-select
+    document.querySelectorAll(".tools-container .option").forEach(option => {
+        option.addEventListener("click", function() {
+            const val = this.textContent.trim();
+            if (selections.tools.includes(val)) {
+                selections.tools = selections.tools.filter(t => t !== val);
+                this.classList.remove("selected");
+            } else {
+                selections.tools.push(val);
+                this.classList.add("selected");
             }
         });
     });
+
+    // Add a "Next" button for tools step
+    const nextButton = document.createElement("button");
+    nextButton.textContent = "Next";
+    nextButton.className = "button next-button";
+    nextButton.addEventListener("click", function() {
+        goToNextStep();
+    });
+    document.querySelector(".tools-container").appendChild(nextButton);
+
+    // Handle generic steps
+    steps.forEach((step, index) => {
+        const container = document.querySelector(step);
+        if (!container) return;
+
+        const options = container.querySelectorAll(
+            ".option:not(.tool):not(.subrole):not(.specialization)");
+        options.forEach(option => {
+            option.addEventListener("click", function() {
+                const val = this.textContent.trim();
+                const key = step.replace('.', '').replace('-container', '');
+                selections[key] = val;
+                goToNextStep();
+            });
+        });
+
+        const backButton = container.querySelector(".back-button");
+        if (backButton) {
+            backButton.addEventListener("click", function() {
+                if (currentStep > 0) {
+                    currentStep--;
+                    showStep(currentStep);
+                }
+            });
+        }
+    });
+
+    // Handle "Find My Match" click
+    const findButton = document.querySelector(".recruiter-container .find-button");
+    if (findButton) {
+        findButton.addEventListener("click", function() {
+            // Optionally, collect recruiter form values here
+            selections.recruiter = {
+                name: document.getElementById("recruiter-name").value.trim(),
+                email: document.getElementById("recruiter-email").value.trim(),
+                phone: document.getElementById("recruiter-phone").value.trim(),
+            };
+
+            // Proceed to loading
+            currentStep++;
+            showStep(currentStep);
+        });
+    }
+
+});
 </script>
 
 <?php

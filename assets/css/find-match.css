@@ -104,6 +104,55 @@
 #findMatch .next-button:focus {
   background-color: var(--primary-color);
 }
+#findMatch .form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+#findMatch .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#findMatch .form-group label {
+  font-family: var(--text-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--dark-text-color);
+}
+#findMatch .form-group input {
+  font-family: var(--text-font-family);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--dark-text-color);
+  padding: 10px;
+  outline: none;
+  border: var(--border);
+  border-radius: 5px;
+}
+#findMatch .form-group input:focus {
+  border-color: var(--accent-color);
+  background-color: #eef8ff;
+}
+#findMatch .button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+#findMatch .button-group .button {
+  flex: 1;
+}
+#findMatch .button-group .button:hover {
+  color: #fff;
+  background-color: var(--accent-color);
+}
+#findMatch .button-group .button.find-button {
+  color: #fff;
+  background-color: var(--accent-color);
+}
+#findMatch .button-group .button.find-button:hover {
+  background-color: var(--primary-color);
+}
 #findMatch .match-cards {
   margin-top: 20px;
   display: flex;
@@ -178,13 +227,13 @@
   text-overflow: ellipsis;
 }
 #findMatch .match-cards .card .button {
-width: 100%;
-background-color: var(--accent-color);
-color: #fff;
-text-align: center;
-font-weight: 500;
-font-size: 14px;
-padding: 10px;
+  width: 100%;
+  background-color: var(--accent-color);
+  color: #fff;
+  text-align: center;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 10px;
 }
 #findMatch .match-cards .card .button:hover {
   background-color: var(--primary-color);

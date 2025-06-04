@@ -15,7 +15,7 @@ function render_custom_job_listing() {
         <!-- Sidebar Filters -->
         <div class="col sidebar">
             <div class="sidebar-header">
-                <h3 class="sidebar-heading">Advance Filter</h3>
+                <h3 class="sidebar-heading">Filters</h3>
                 <a href="javascript:void()" class="reset-button">Reset</a>
             </div>
             <div class="filter-group">
@@ -33,9 +33,17 @@ function render_custom_job_listing() {
                     'industry-expertise' => $industry,
                 ];
 
+                $custom_headings = [
+                    'skills' => 'Specialization',
+                    'years-of-experience' => 'Experience Level',
+                    'location-preference' => 'Location',
+                    'availability' => 'Availability',
+                    'industry-expertise' => 'Sector',
+                ];
+
                 foreach ($filters as $key => $terms) {
                     echo '<div class="filter-group">';
-                    echo '<h4 class="filter-heading">' . ucwords(str_replace('-', ' ', $key)) . '</h4>';
+                    echo '<h4 class="filter-heading">' . esc_html($custom_headings[$key]) . '</h4>';
                     echo '<div class="filter-items">';
                     foreach ($terms as $term) {
                         echo '<div class="filter-item">';
