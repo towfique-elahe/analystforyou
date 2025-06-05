@@ -3,6 +3,20 @@
  * Roles Management
  */
 
+ // Remove Existing Custom Roles
+function customtheme_remove_custom_roles() {
+    remove_role('parent');
+    remove_role('teacher');
+    remove_role('student');
+    remove_role('hr');
+    remove_role('employer');
+    remove_role('subscriber');
+    remove_role('contributor');
+    remove_role('author');
+    remove_role('editor');
+}
+add_action('init', 'customtheme_remove_custom_roles', 9);
+
 // Custom User Roles with Base Capabilities
 function customtheme_add_custom_roles() {
     // Define base capabilities for all roles
@@ -37,10 +51,10 @@ function customtheme_add_custom_roles() {
         $base_caps
     );
 
-    // Add Employer Role
+    // Add Recruiter Role
     add_role(
-        'employer',
-        __('Employer', 'customtheme'),
+        'recruiter',
+        __('Recruiter', 'customtheme'),
         $base_caps
     );
 }
@@ -48,7 +62,7 @@ add_action('init', 'customtheme_add_custom_roles');
 
 // Hide Admin Toolbar for Specific Roles
 function customtheme_hide_admin_toolbar($show_toolbar) {
-    $roles_to_hide_toolbar = ['admin', 'candidate', 'employer'];
+    $roles_to_hide_toolbar = ['admin', 'candidate', 'recruiter'];
 
     foreach ($roles_to_hide_toolbar as $role) {
         if (current_user_can($role)) {
