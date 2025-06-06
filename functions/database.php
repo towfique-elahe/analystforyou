@@ -6,7 +6,7 @@
 function create_custom_tables() {
     global $wpdb;
 
-    $custom_tables_version = '1.0.1';
+    $custom_tables_version = '1.0.2';
     $installed_version = get_option('custom_tables_version');
 
     if ($installed_version === $custom_tables_version) {
@@ -35,6 +35,7 @@ function create_custom_tables() {
         lang_tools VARCHAR(255) NULL,
         experience VARCHAR(255) NULL,
         availability VARCHAR(255) NULL,
+        sector VARCHAR(255) NULL,
         education VARCHAR(255) NULL,
         languages VARCHAR(255) NULL,
         cv VARCHAR(255) NULL,

@@ -114,13 +114,27 @@
   flex-direction: column;
   gap: 10px;
 }
+#findMatch .consent-group {
+  flex-direction: row;
+  gap: 5px;
+  margin-top: 10px;
+}
 #findMatch .form-group label {
   font-family: var(--text-font-family);
   font-weight: 500;
   font-size: 14px;
   color: var(--dark-text-color);
 }
-#findMatch .form-group input {
+#findMatch .form-group .required {
+  color: crimson;
+  font-weight: 500;
+}
+#findMatch .consent-group label {
+  color: var(--text-color);
+}
+#findMatch .form-group input,
+#findMatch .form-group select,
+#findMatch .form-group textarea {
   font-family: var(--text-font-family);
   font-weight: 400;
   font-size: 14px;
@@ -130,7 +144,19 @@
   border: var(--border);
   border-radius: 5px;
 }
-#findMatch .form-group input:focus {
+#findMatch .form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+#findMatch .form-group select {
+  cursor: pointer;
+}
+#findMatch .form-group input[type="checkbox"] {
+  accent-color: var(--accent-color);
+}
+#findMatch .form-group input:focus,
+#findMatch .form-group select:focus,
+#findMatch .form-group textarea:focus {
   border-color: var(--accent-color);
   background-color: #eef8ff;
 }
@@ -146,11 +172,13 @@
   color: #fff;
   background-color: var(--accent-color);
 }
-#findMatch .button-group .button.find-button {
+#findMatch .button-group .button.find-button,
+#findMatch .contact-form-container .submit-button {
   color: #fff;
   background-color: var(--accent-color);
 }
-#findMatch .button-group .button.find-button:hover {
+#findMatch .button-group .button.find-button:hover,
+#findMatch .contact-form-container .submit-button:hover {
   background-color: var(--primary-color);
 }
 #findMatch .match-cards {
@@ -159,24 +187,36 @@
   flex-wrap: wrap;
   gap: 20px;
 }
+#findMatch .match-cards .no-match {
+  width: 100%;
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: 500;
+  font-size: 16px;
+  text-align: center;
+}
 #findMatch .match-cards .card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   width: calc(33.33% - 14px);
   background-color: #fff;
   border: var(--border);
   border-radius: 15px;
   padding: 20px 25px;
-  gap: 20px;
 }
 #findMatch .match-cards .card .col:last-of-type {
   flex: 1.5;
   justify-content: center;
 }
-#findMatch .match-cards .card .image {
+#findMatch .match-cards .card .avatar-container {
   width: 120px;
   height: 120px;
-  object-fit: cover;
   border-radius: 50%;
   border: var(--border);
+}
+#findMatch .match-cards .card .avatar {
+  font-size: 48px;
 }
 #findMatch .match-cards .card h4,
 #findMatch .match-cards .card p {
@@ -212,6 +252,7 @@
 #findMatch .match-cards .card .tool {
   background-color: #e7eef7;
   color: var(--primary-color);
+  font-family: var(--primary-font-family);
   font-weight: 500;
   font-size: 14px;
   padding: 5px 10px;
@@ -237,4 +278,11 @@
 }
 #findMatch .match-cards .card .button:hover {
   background-color: var(--primary-color);
+}
+#findMatch .contact-form-container .confirmation-message p {
+  color: var(--primary-color);
+  font-family: var(--primary-font-family);
+  font-weight: 500;
+  font-size: 16px;
+  text-align: center;
 }

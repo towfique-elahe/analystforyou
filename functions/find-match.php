@@ -91,11 +91,11 @@ function render_find_match() {
         <p class="sub-heading">Please provide your contact information</p>
         <form class="form recruiter-form">
             <div class="form-group">
-                <label for="recruiter-name">Your Name</label>
+                <label for="recruiter-name">Your Name <span class="required">*</span></label>
                 <input type="text" id="recruiter-name" name="recruiter-name" placeholder="Enter your full name">
             </div>
             <div class="form-group">
-                <label for="recruiter-email">Your Email</label>
+                <label for="recruiter-email">Your Email <span class="required">*</span></label>
                 <input type="email" id="recruiter-email" name="recruiter-email" placeholder="Enter your email address">
             </div>
             <div class="form-group">
@@ -116,48 +116,103 @@ function render_find_match() {
 
     <!-- Matches -->
     <div class="container match-container">
-        <h3 class="heading">3 Matches Found</h3>
-        <div class="match-cards">
-            <?php for ($i = 1; $i <= 3; $i++): ?>
-            <div class="col card">
-                <div class="row head">
-                    <div class="col">
-                        <img src="<?php echo get_template_directory_uri(); ?>/assets/media/user.png" alt="User"
-                            class="image">
-                    </div>
-                    <div class="col">
-                        <h4 class="name">Candidate
-                            <?= $i ?>
-                        </h4>
-                        <p class="specialization">BI Specialist</p>
-                        <div class="flags">
-                            🇺🇸 🇳🇱
-                        </div>
-                    </div>
-                </div>
-                <div class="body">
-                    <div class="tools">
-                        <span class="tool">Power BI</span>
-                        <span class="tool">SQL</span>
-                        <span class="tool">Excel</span>
-                    </div>
-                    <p class="bio">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Veniam, quibusdam!</p>
-                    <p><strong>Sub Role:</strong> Power BI Specialist</p>
-                    <p><strong>Experience:</strong> Mid-level (3–5 years)</p>
-                    <p><strong>Availability:</strong> Full-time</p>
-                    <p><strong>Sector:</strong> Finance</p>
-                </div>
-                <div class="footer">
-                    <button class="button">Contact Now</button>
-                </div>
+        <h3 class="heading match-heading">Matches Found</h3>
+        <div class="match-cards"></div>
+    </div>
+
+    <!-- Contact Form Container -->
+    <div class="container contact-form-container">
+        <h3 class="heading">Recruiter Contact Form</h3>
+        <form class="form contact-form">
+            <div class="form-group">
+                <label for="contact-recruiter-name">Your Name <span class="required">*</span></label>
+                <input type="text" id="contact-recruiter-name" name="contact-recruiter-name"
+                    placeholder="Enter your full name" required>
             </div>
-            <?php endfor; ?>
+            <div class="form-group">
+                <label for="contact-company-name">Company Name <span class="required">*</span></label>
+                <input type="text" id="contact-company-name" name="contact-company-name"
+                    placeholder="Enter your company name" required>
+            </div>
+            <div class="form-group">
+                <label for="contact-email">Your Email Address <span class="required">*</span></label>
+                <input type="email" id="contact-email" name="contact-email" placeholder="e.g., you@example.com"
+                    required>
+            </div>
+            <div class="form-group">
+                <label for="contact-phone">Phone Number</label>
+                <input type="tel" id="contact-phone" name="contact-phone" placeholder="e.g., +1234567890">
+            </div>
+            <div class="form-group">
+                <label for="contact-role">Candidate Role</label>
+                <input type="text" id="contact-role" name="contact-role" placeholder="Candidate Role" readonly>
+            </div>
+            <div class="form-group">
+                <label for="contact-message">Message / Why You're Interested <span class="required">*</span></label>
+                <textarea id="contact-message" name="contact-message"
+                    placeholder="Briefly explain your interest in this candidate" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="contact-urgency">How urgent is this need? <span class="required">*</span></label>
+                <select id="contact-urgency" name="contact-urgency" required>
+                    <option value="" disabled selected>Select urgency level</option>
+                    <option>Immediate</option>
+                    <option>Within 1 week</option>
+                    <option>Flexible</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Preferred Contact Method <span class="required">*</span></label>
+                <select id="contact-method" name="contact-method" required>
+                    <option value="" disabled selected>Select preferred contact method</option>
+                    <option>Email</option>
+                    <option>Phone</option>
+                    <option>Either</option>
+                </select>
+            </div>
+            <div class="form-group consent-group">
+                <input type="checkbox" id="contact-consent" required>
+                <label for="contact-consent">I agree to be contacted and that this message will be sent to the platform
+                    admin.</label>
+            </div>
+            <div class="button-group">
+                <button type="button" class="button back-button">Back</button>
+                <button type="submit" class="button submit-button">Send Request</button>
+            </div>
+        </form>
+        <div class="confirmation-message" style="display:none;">
+            <p>Thank you, your message has been sent to the admin. You'll be contacted shortly.</p>
         </div>
     </div>
+
 </div>
 
+<?php
+$ajax_url = admin_url('admin-ajax.php');
+$theme_url = get_template_directory_uri();
+?>
+
 <script>
+// Generate consistent background color from a string
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const color = `hsl(${hash % 360}, 70%, 60%)`; // nice pastel range
+    return color;
+}
+
+// Obfuscate last name like "W**H"
+function obfuscateLastName(name = "") {
+    if (!name || name.length < 2) return "*";
+    return `${name.charAt(0).toUpperCase()}**${name.charAt(name.length - 1).toUpperCase()}`;
+}
+
 document.addEventListener("DOMContentLoaded", function() {
+    const ajaxUrl = "<?php echo esc_url($ajax_url); ?>";
+    const fallbackImage = "<?php echo esc_url($theme_url . '/assets/media/user.png'); ?>";
+
     const steps = [
         ".specialization-container",
         ".subrole-container",
@@ -167,7 +222,8 @@ document.addEventListener("DOMContentLoaded", function() {
         ".sector-container",
         ".recruiter-container",
         ".loading-container",
-        ".match-container"
+        ".match-container",
+        ".contact-form-container"
     ];
 
     const subrolesMap = {
@@ -312,18 +368,127 @@ document.addEventListener("DOMContentLoaded", function() {
     const findButton = document.querySelector(".recruiter-container .find-button");
     if (findButton) {
         findButton.addEventListener("click", function() {
-            // Optionally, collect recruiter form values here
+            const nameInput = document.getElementById("recruiter-name");
+            const emailInput = document.getElementById("recruiter-email");
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+
+            // Validate Name and Email
+            if (!name || !email) {
+                alert("Please enter your name and email to find your match.");
+                if (!name) nameInput.focus();
+                else emailInput.focus();
+                return;
+            }
+
             selections.recruiter = {
-                name: document.getElementById("recruiter-name").value.trim(),
-                email: document.getElementById("recruiter-email").value.trim(),
+                name,
+                email,
                 phone: document.getElementById("recruiter-phone").value.trim(),
             };
 
-            // Proceed to loading
+            // Show loading
             currentStep++;
             showStep(currentStep);
+
+            // Send AJAX request to find candidates
+            fetch(ajaxUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({
+                        action: "find_best_candidates",
+                        data: JSON.stringify(selections),
+                    }),
+                })
+                .then((res) => res.json())
+                .then((candidates) => {
+                    const container = document.querySelector(".match-cards");
+                    container.innerHTML = ""; // Clear previous matches
+
+                    // update dynamic heading
+                    document.querySelector(".match-heading").textContent =
+                        `${candidates.length} Match${candidates.length !== 1 ? "es" : ""} Found`;
+
+                    if (candidates.length === 0) {
+                        container.innerHTML =
+                            "<p class='no-match'>No matching candidates found.</p>";
+                    } else {
+                        candidates.forEach((candidate) => {
+                            const card = `
+        <div class="card">
+            <div class="row head">
+                <div class="col">
+                    <div class="avatar-container">
+                        <div class="avatar" style="background-color: ${stringToColor(candidate.first_name)};">
+                            ${candidate.first_name?.charAt(0).toUpperCase() || ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <h4 class="name">${candidate.first_name} ${obfuscateLastName(candidate.last_name)}</h4>
+                    <p class="specialization">${candidate.specialization}</p>
+                    <div class="flags">
+                        ${candidate.country?.includes("United States") ? "🇺🇸" : ""}
+                        ${candidate.country?.includes("Netherlands") ? "🇳🇱" : ""}
+                    </div>
+                </div>
+            </div>
+            <div class="body">
+                <div class="tools">
+                    ${candidate.lang_tools?.split(',').map(tool => `<span class="tool">${tool.trim()}</span>`).join('') || ''}
+                </div>
+                <p class="bio">${candidate.bio || 'No bio available.'}</p>
+                <p><strong>Sub Role:</strong> ${candidate.sub_role}</p>
+                <p><strong>Experience:</strong> ${candidate.experience}</p>
+                <p><strong>Availability:</strong> ${candidate.availability}</p>
+                <p><strong>Sector:</strong> ${candidate.sector}</p>
+            </div>
+            <div class="footer">
+                <button class="button">Contact Now</button>
+            </div>
+        </div>`;
+                            container.innerHTML += card;
+                        });
+
+                        // Attach event to Contact Now buttons after loading matches
+                        document.querySelectorAll(".match-container .card .footer .button").forEach(
+                            button => {
+                                button.addEventListener("click", function() {
+                                    const card = this.closest('.card');
+                                    const role = card.querySelector('.specialization')
+                                        .textContent.trim();
+
+                                    document.getElementById("contact-role").value =
+                                        role;
+
+                                    currentStep++;
+                                    showStep(currentStep);
+                                });
+                            });
+                    }
+                });
         });
     }
+
+    // Form submission handling
+    document.querySelector('.contact-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Optional: AJAX submission to server here
+
+        // Show confirmation message
+        document.querySelector('.contact-form').style.display = 'none';
+        document.querySelector('.confirmation-message').style.display = 'block';
+    });
+
+    // Handle Back button in contact form
+    document.querySelector('.contact-form-container .back-button').addEventListener('click', function() {
+        currentStep--;
+        showStep(currentStep);
+    });
 
 });
 </script>
@@ -331,5 +496,98 @@ document.addEventListener("DOMContentLoaded", function() {
 <?php
     return ob_get_clean();
 }
-
 add_shortcode('find_match', 'render_find_match');
+
+// Finding candidates AJAX handler
+add_action('wp_ajax_find_best_candidates', 'handle_find_best_candidates');
+add_action('wp_ajax_nopriv_find_best_candidates', 'handle_find_best_candidates');
+
+function handle_find_best_candidates() {
+    global $wpdb;
+
+    error_log("AJAX: find_best_candidates called");
+
+    $raw_data = $_POST['data'] ?? '';
+    error_log("Raw POST data: " . $raw_data);
+
+    $selections = json_decode(stripslashes($raw_data), true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("JSON decode error: " . json_last_error_msg());
+        wp_send_json_error(["error" => "Invalid JSON"]);
+    }
+
+    error_log("Decoded selections: " . print_r($selections, true));
+
+    $specialization = $selections['specialization'] ?? '';
+    $sub_role = $selections['subrole'] ?? '';
+    $experience = $selections['experience'] ?? '';
+    $availability = $selections['availability'] ?? '';
+    $sector = $selections['sector'] ?? '';
+    $tools = $selections['tools'] ?? [];
+
+    $table = $wpdb->prefix . "candidates";
+
+    // Start query
+    $query = "SELECT * FROM $table WHERE status = 'Approved'";
+    $params = [];
+
+    if ($specialization) {
+        $query .= " AND specialization = %s";
+        $params[] = $specialization;
+    }
+
+    if ($sub_role) {
+        $query .= " AND sub_role = %s";
+        $params[] = $sub_role;
+    }
+
+    if ($experience) {
+        $query .= " AND experience = %s";
+        $params[] = $experience;
+    }
+
+    if ($availability) {
+        $query .= " AND availability = %s";
+        $params[] = $availability;
+    }
+
+    if ($sector) {
+        $query .= " AND sector = %s";
+        $params[] = $sector;
+    }
+
+    $query .= " ORDER BY updated_at DESC LIMIT 10";
+
+    error_log("Prepared query: $query");
+    error_log("With params: " . print_r($params, true));
+
+    try {
+        $results = $wpdb->get_results($wpdb->prepare($query, ...$params), ARRAY_A);
+        error_log("DB results: " . print_r($results, true));
+    } catch (Exception $e) {
+        error_log("DB query error: " . $e->getMessage());
+        wp_send_json_error(["error" => "Database error"]);
+    }
+
+    // exclude candidates with 0 matching tools
+    $results = array_filter($results, function($candidate) use ($tools) {
+        $candidateTools = array_map('trim', explode(',', $candidate['lang_tools'] ?? ''));
+        return count(array_intersect($tools, $candidateTools)) > 0;
+    });
+
+    if (!$results) {
+        error_log("No candidates found matching filters.");
+        wp_send_json([]);
+    }
+
+    // Score based on tools
+    foreach ($results as &$candidate) {
+        $candidate_tools = explode(',', $candidate['lang_tools'] ?? '');
+        $score = count(array_intersect(array_map('trim', $candidate_tools), $tools));
+        $candidate['score'] = $score;
+    }
+
+    usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
+    wp_send_json($results);
+
+}
