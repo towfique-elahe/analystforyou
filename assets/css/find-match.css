@@ -50,7 +50,7 @@
 }
 #findMatch .options {
   width: 100%;
-  height: 320px;
+  height: 380px;
   overflow: hidden;
   overflow-y: auto;
   display: flex;
@@ -239,6 +239,10 @@
   color: var(--primary-color);
   font-size: 16px;
 }
+#findMatch .match-cards .card .flags {
+  display: flex;
+  gap: 5px;
+}
 #findMatch .match-cards .card .body {
   display: flex;
   flex-direction: column;
@@ -279,6 +283,7 @@
 #findMatch .match-cards .card .button:hover {
   background-color: var(--primary-color);
 }
+#findMatch .contact-form-container .loader-message p,
 #findMatch .contact-form-container .confirmation-message p {
   color: var(--primary-color);
   font-family: var(--primary-font-family);

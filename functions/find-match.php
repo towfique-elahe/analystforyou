@@ -180,6 +180,11 @@ function render_find_match() {
                 <button type="submit" class="button submit-button">Send Request</button>
             </div>
         </form>
+        <!-- New loader to show after clicking the Request button -->
+        <div class="loader-message" style="display:none;">
+            <p>Submitting your request...</p>
+            <!-- <div class="loader"></div> -->
+        </div>
         <div class="confirmation-message" style="display:none;">
             <p>Thank you, your message has been sent to the admin. You'll be contacted shortly.</p>
         </div>
@@ -207,6 +212,99 @@ function stringToColor(str) {
 function obfuscateLastName(name = "") {
     if (!name || name.length < 2) return "*";
     return `${name.charAt(0).toUpperCase()}**${name.charAt(name.length - 1).toUpperCase()}`;
+}
+
+// Function to return the flag emojis based on languages
+function getLanguageFlag(languages) {
+    const languageFlags = {
+        "English": "🇬🇧",
+        "Dutch": "🇳🇱",
+        "Spanish": "🇪🇸",
+        "French": "🇫🇷",
+        "German": "🇩🇪",
+        "Italian": "🇮🇹",
+        "Portuguese": "🇵🇹",
+        "Russian": "🇷🇺",
+        "Chinese": "🇨🇳",
+        "Japanese": "🇯🇵",
+        "Arabic": "🇸🇦",
+        "Hindi": "🇮🇳",
+        "Swedish": "🇸🇪",
+        "Turkish": "🇹🇷",
+        "Korean": "🇰🇷",
+        "Finnish": "🇫🇮",
+        "Polish": "🇵🇱",
+        "Czech": "🇨🇿",
+        "Danish": "🇩🇰",
+        "Norwegian": "🇳🇴",
+        "Greek": "🇬🇷",
+        "Hungarian": "🇭🇺",
+        "Romanian": "🇷🇴",
+        "Bulgarian": "🇧🇬",
+        "Ukrainian": "🇺🇦",
+        "Hebrew": "🇮🇱",
+        "Malay": "🇲🇾",
+        "Thai": "🇹🇭",
+        "Vietnamese": "🇻🇳",
+        "Indonesian": "🇮🇩",
+        "Filipino": "🇵🇭",
+        "Swahili": "🇿🇦",
+        "Persian": "🇮🇷",
+        "Tamil": "🇮🇳",
+        "Bengali": "🇧🇩",
+        "Gujarati": "🇮🇳",
+        "Punjabi": "🇮🇳",
+        "Marathi": "🇮🇳",
+        "Urdu": "🇵🇰",
+        "Malayalam": "🇮🇳",
+        "Telugu": "🇮🇳",
+        "Kannada": "🇮🇳",
+        "Nepali": "🇳🇵",
+        "Sinhala": "🇱🇰",
+        "Pashto": "🇦🇫",
+        "Khmer": "🇰🇭",
+        "Lao": "🇱🇸",
+        "Georgian": "🇬🇪",
+        "Albanian": "🇦🇱",
+        "Serbian": "🇷🇸",
+        "Croatian": "🇭🇷",
+        "Bosnian": "🇧🇦",
+        "Slovak": "🇸🇰",
+        "Estonian": "🇪🇪",
+        "Latvian": "🇱🇻",
+        "Lithuanian": "🇱🇹",
+        "Icelandic": "🇮🇸",
+        "Maltese": "🇲🇹",
+        "Armenian": "🇦🇲",
+        "Azerbaijani": "🇦🇿",
+        "Kazakh": "🇰🇿",
+        "Uzbek": "🇺🇿",
+        "Tajik": "🇹🇯",
+        "Kyrgyz": "🇰🇬",
+        "Turkmen": "🇹🇲",
+        "Mongolian": "🇲🇳",
+        "Burmese": "🇲🇲",
+        "Nepali": "🇳🇵",
+        "Tigrinya": "🇪🇷",
+        "Somali": "🇸🇴",
+        "Haitian Creole": "🇭🇹",
+        "Catalan": "🇪🇸",
+        "Basque": "🇪🇸",
+        "Galician": "🇪🇸",
+        "Scottish Gaelic": "🇬🇧",
+        "Irish": "🇮🇪",
+        "Welsh": "🇬🇧",
+        "Breton": "🇫🇷",
+        "Corsican": "🇫🇷",
+        "Sicilian": "🇮🇹",
+        "Esperanto": "🇪🇺",
+        "Latin": "🇻🇦",
+        "Yiddish": "🇮🇱"
+    };
+
+    const flags = languages.split(',').map(language => language.trim())
+        .map(language => languageFlags[language] || ''); // return the respective flag emoji
+    return flags;
 }
 
 document.addEventListener("DOMContentLoaded", function() {
@@ -418,7 +516,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     } else {
                         candidates.forEach((candidate) => {
                             const card = `
-        <div class="card">
+        <div class="card" data-id="${candidate.id}" data-candidate='${encodeURIComponent(JSON.stringify(candidate))}'>
             <div class="row head">
                 <div class="col">
                     <div class="avatar-container">
@@ -431,8 +529,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     <h4 class="name">${candidate.first_name} ${obfuscateLastName(candidate.last_name)}</h4>
                     <p class="specialization">${candidate.specialization}</p>
                     <div class="flags">
-                        ${candidate.country?.includes("United States") ? "🇺🇸" : ""}
-                        ${candidate.country?.includes("Netherlands") ? "🇳🇱" : ""}
+                        ${getLanguageFlag(candidate.languages).join('')}
                     </div>
                 </div>
             </div>
@@ -447,27 +544,46 @@ document.addEventListener("DOMContentLoaded", function() {
                 <p><strong>Sector:</strong> ${candidate.sector}</p>
             </div>
             <div class="footer">
-                <button class="button">Contact Now</button>
+                <button class="button">Contact Analyst</button>
             </div>
         </div>`;
                             container.innerHTML += card;
                         });
 
-                        // Attach event to Contact Now buttons after loading matches
+                        // Attach event to Contact Analyst buttons after loading matches
                         document.querySelectorAll(".match-container .card .footer .button").forEach(
                             button => {
                                 button.addEventListener("click", function() {
                                     const card = this.closest('.card');
-                                    const role = card.querySelector('.specialization')
-                                        .textContent.trim();
+                                    const candidateData = JSON.parse(decodeURIComponent(
+                                        card.getAttribute('data-candidate')));
 
+                                    // Set the selected candidate's role in the contact form
                                     document.getElementById("contact-role").value =
-                                        role;
+                                        candidateData.sub_role;
+
+                                    // Capture full candidate details
+                                    selections.contactCandidateDetails = {
+                                        id: candidateData.id,
+                                        first_name: candidateData.first_name,
+                                        last_name: candidateData.last_name,
+                                        specialization: candidateData
+                                            .specialization,
+                                        sub_role: candidateData
+                                            .sub_role, // This is the role
+                                        experience: candidateData.experience,
+                                        availability: candidateData.availability,
+                                        sector: candidateData.sector,
+                                        tools: candidateData.lang_tools?.split(',')
+                                            .map(t => t.trim()) || [],
+                                        bio: candidateData.bio,
+                                    };
 
                                     currentStep++;
                                     showStep(currentStep);
                                 });
                             });
+
                     }
                 });
         });
@@ -477,11 +593,61 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector('.contact-form').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        // Optional: AJAX submission to server here
+        // Gather form data
+        const formData = {
+            name: document.getElementById("contact-recruiter-name").value.trim(),
+            company: document.getElementById("contact-company-name").value.trim(),
+            email: document.getElementById("contact-email").value.trim(),
+            phone: document.getElementById("contact-phone").value.trim(),
+            role: document.getElementById("contact-role").value.trim(),
+            message: document.getElementById("contact-message").value.trim(),
+            urgency: document.getElementById("contact-urgency").value,
+            method: document.getElementById("contact-method").value,
+            candidate: selections.contactCandidateDetails,
+        };
 
-        // Show confirmation message
+        // Simple validation (HTML required attributes already help)
+        if (!formData.name || !formData.company || !formData.email || !formData.message || !formData
+            .urgency || !formData.method) {
+            alert("Please fill in all required fields.");
+            return;
+        }
+
+        // Show loading message immediately
+        document.querySelector('.loader-message').style.display = 'block';
         document.querySelector('.contact-form').style.display = 'none';
-        document.querySelector('.confirmation-message').style.display = 'block';
+
+        // Send to server via AJAX
+        fetch(ajaxUrl, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    action: "send_candidate_contact_request",
+                    data: JSON.stringify(formData),
+                }),
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    document.querySelector('.loader-message').style.display = 'none';
+                    document.querySelector('.confirmation-message').style.display = 'block';
+                } else {
+                    alert("Failed to send message. Please try again later.");
+                    console.error(response);
+                    // Hide loader and show the form again in case of failure
+                    document.querySelector('.loader-message').style.display = 'none';
+                    document.querySelector('.contact-form').style.display = 'block';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("There was an error. Please try again later.");
+                document.querySelector('.loader-message').style.display = 'none';
+                document.querySelector('.contact-form').style.display = 'block';
+            });
+
     });
 
     // Handle Back button in contact form
@@ -514,6 +680,30 @@ function handle_find_best_candidates() {
     if (json_last_error() !== JSON_ERROR_NONE) {
         error_log("JSON decode error: " . json_last_error_msg());
         wp_send_json_error(["error" => "Invalid JSON"]);
+    }
+
+    // Send recruiter form data to admin via email
+    $recruiter = $selections['recruiter'] ?? [];
+    $admin_email = get_option('admin_email');
+
+    if ($recruiter && $admin_email) {
+        $subject = 'New Recruiter Match Request';
+        $message = "A recruiter has submitted a match request with the following details:\n\n";
+        $message .= "Name: " . sanitize_text_field($recruiter['name']) . "\n";
+        $message .= "Email: " . sanitize_email($recruiter['email']) . "\n";
+        $message .= "Phone: " . sanitize_text_field($recruiter['phone'] ?? '') . "\n\n";
+
+        $message .= "Selections:\n";
+        $message .= "Specialization: " . ($selections['specialization'] ?? '') . "\n";
+        $message .= "Sub Role: " . ($selections['subrole'] ?? '') . "\n";
+        $message .= "Experience: " . ($selections['experience'] ?? '') . "\n";
+        $message .= "Availability: " . ($selections['availability'] ?? '') . "\n";
+        $message .= "Sector: " . ($selections['sector'] ?? '') . "\n";
+        $message .= "Tools: " . implode(', ', $selections['tools'] ?? []) . "\n";
+
+        $headers = ['Content-Type: text/plain; charset=UTF-8'];
+
+        wp_mail($admin_email, $subject, $message, $headers);
     }
 
     error_log("Decoded selections: " . print_r($selections, true));
@@ -590,4 +780,77 @@ function handle_find_best_candidates() {
     usort($results, fn($a, $b) => $b['score'] <=> $a['score']);
     wp_send_json($results);
 
+}
+
+// Contacct form AJAX handler
+add_action('wp_ajax_send_candidate_contact_request', 'handle_send_candidate_contact_request');
+add_action('wp_ajax_nopriv_send_candidate_contact_request', 'handle_send_candidate_contact_request');
+
+function handle_send_candidate_contact_request() {
+    $admin_email = get_option('admin_email');
+
+    $data = $_POST['data'] ?? '';
+    $decoded = json_decode(stripslashes($data), true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        wp_send_json_error(['error' => 'Invalid JSON']);
+    }
+
+    $name    = sanitize_text_field($decoded['name'] ?? '');
+    $company = sanitize_text_field($decoded['company'] ?? '');
+    $email   = sanitize_email($decoded['email'] ?? '');
+    $phone   = sanitize_text_field($decoded['phone'] ?? '');
+    $role    = sanitize_text_field($decoded['role'] ?? '');
+    $message = sanitize_textarea_field($decoded['message'] ?? '');
+    $urgency = sanitize_text_field($decoded['urgency'] ?? '');
+    $method  = sanitize_text_field($decoded['method'] ?? '');
+
+    $candidate = $decoded['candidate'] ?? [];
+
+    $candidate_id = sanitize_text_field($candidate['id'] ?? '');
+    $candidate_first_name = sanitize_text_field($candidate['first_name'] ?? '');
+    $candidate_last_name = sanitize_text_field($candidate['last_name'] ?? '');
+    $candidate_name = trim("$candidate_first_name $candidate_last_name");
+    $candidate_spec = sanitize_text_field($candidate['specialization'] ?? '');
+    $candidate_subrole = sanitize_text_field($candidate['sub_role'] ?? '');
+    $candidate_exp = sanitize_text_field($candidate['experience'] ?? '');
+    $candidate_avail = sanitize_text_field($candidate['availability'] ?? '');
+    $candidate_sector = sanitize_text_field($candidate['sector'] ?? '');
+    $candidate_tools = is_array($candidate['tools']) ? implode(', ', array_map('sanitize_text_field', $candidate['tools'])) : '';
+    $candidate_bio = sanitize_textarea_field($candidate['bio'] ?? '');
+
+    $email_subject = "Recruiter Contact Request for Candidate Id: $candidate_id";
+
+    $email_body = "Recruiter Contact Request\n\n";
+    $email_body .= "== Recruiter Details ==\n";
+    $email_body .= "Name: $name\n";
+    $email_body .= "Company: $company\n";
+    $email_body .= "Email: $email\n";
+    $email_body .= "Phone: $phone\n";
+    $email_body .= "Urgency: $urgency\n";
+    $email_body .= "Preferred Contact Method: $method\n\n";
+    $email_body .= "Message:\n$message\n\n";
+
+    $email_body .= "== Candidate Information ==\n";
+    $email_body .= "Candidate ID: $candidate_id\n";
+    $email_body .= "Name: $candidate_name\n";
+    $email_body .= "Specialization: $candidate_spec\n";
+    $email_body .= "Sub-role: $candidate_subrole\n";
+    $email_body .= "Experience: $candidate_exp\n";
+    $email_body .= "Availability: $candidate_avail\n";
+    $email_body .= "Sector: $candidate_sector\n";
+    $email_body .= "Tools: $candidate_tools\n";
+    $email_body .= "Bio: $candidate_bio\n";
+
+    error_log("Sending contact request email:\n" . $email_body);
+
+    $headers = ['Content-Type: text/plain; charset=UTF-8'];
+
+    $success = wp_mail($admin_email, $email_subject, $email_body, $headers);
+
+    if ($success) {
+        wp_send_json_success(['message' => 'Request sent successfully.']);
+    } else {
+        wp_send_json_error(['error' => 'Failed to send email.']);
+    }
 }
