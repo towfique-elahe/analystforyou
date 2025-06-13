@@ -264,6 +264,7 @@
   border-radius: 3px;
 }
 #findMatch .match-cards .card .bio {
+  height: 36px;
   margin-top: 10px;
   display: -webkit-box;
   -webkit-line-clamp: 2;

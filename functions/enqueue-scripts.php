@@ -20,9 +20,10 @@ function customtheme_register_styles() {
 
     // Enqueue custom CSS files
     $styles = [
-        'customtheme-root-style'                => 'assets/css/root.css',
-        'customtheme-job-listings-style'     => 'assets/css/job-listings.css',
-        'customtheme-find-match-style'     => 'assets/css/find-match.css',
+        'customtheme-root-style'                    => 'assets/css/root.css',
+        'customtheme-job-listings-style'            => 'assets/css/job-listings.css',
+        'customtheme-find-match-style'              => 'assets/css/find-match.css',
+        'customtheme-featured-candidates-style'     => 'assets/css/featured-candidates.css',
     ];
 
     foreach ($styles as $handle => $path) {

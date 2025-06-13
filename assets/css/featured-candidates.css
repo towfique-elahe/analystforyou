@@ -1,0 +1,83 @@
+.featured-candidates {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.candidate-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: calc(33.33% - 14px);
+  background-color: #fff;
+  border: var(--border);
+  border-radius: 15px;
+  padding: 20px 25px;
+}
+.candidate-card .col:last-of-type {
+  flex: 1.5;
+  justify-content: center;
+}
+.candidate-card .avatar-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: var(--border);
+}
+.candidate-card .avatar {
+  font-size: 48px;
+}
+.candidate-card h4,
+.candidate-card p {
+  margin: 0;
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: 400;
+  font-size: 14px;
+}
+.candidate-card .name {
+  color: var(--dark-text-color);
+  font-family: var(--primary-font-family);
+  font-weight: 600;
+  font-size: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.candidate-card .specialization {
+  color: var(--primary-color);
+  font-size: 16px;
+}
+.candidate-card .flags {
+  display: flex;
+  gap: 5px;
+}
+.candidate-card .body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.candidate-card .tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.candidate-card .tool {
+  background-color: #e7eef7;
+  color: var(--primary-color);
+  font-family: var(--primary-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 5px 10px;
+  border: var(--border);
+  border-radius: 3px;
+}
+.candidate-card .bio {
+  height: 36px;
+  margin-top: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

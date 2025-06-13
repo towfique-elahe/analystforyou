@@ -4,7 +4,7 @@
 - Author: Towfique Elahe
 - Author URI: https://towfique-elahe.framer.website/
 - Description: A custom WordPress theme compatible with Elementor and WooCommerce.
-- Version: 1.0.0.9
+- Version: 1.0.1.0
 - License: GNU General Public License v3 or later
 - License URI: http://www.gnu.org/licenses/gpl-3.0.html
 - Text Domain: anaylyst-for-you
@@ -12,4 +12,5 @@
 
 ### Version: 1.0.0.8
 
-- Updated find match component, recruiters form data and contact analyst form data now send to admin via email, and also added loader for contact requesting process.
+- Homepage featured candidates are dynamic now as like find match candidates cards
+- Created job posting popup form for whole website, which can be trigger from anywhere, design and testing is pending
