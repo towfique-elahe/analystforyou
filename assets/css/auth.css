@@ -1,21 +1,20 @@
-/* login template */
-#login {
+/* auth template */
+#auth {
   width: 100%;
-  height: 80vh;
 }
-#login .container {
+#auth .container {
   width: 100%;
   max-width: 1200px;
-  height: 100%;
+  min-height: 80vh;
   margin: 0 auto;
   align-items: center;
   gap: 100px;
 }
-#login .login-banner {
+#auth .auth-banner {
   width: 100%;
   max-width: 500px;
 }
-#login .candidate-login-form {
+#auth .auth-form {
   background-color: #fff;
   border: var(--border);
   border-radius: 10px;
@@ -24,21 +23,53 @@
   flex-direction: column;
   gap: 15px;
 }
-#login .form-group {
+#auth .error-message {
+  display: none;
+}
+#auth .error {
+  font-family: var(--text-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: crimson;
+}
+#auth .success {
+  font-family: var(--text-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  color: green;
+}
+#auth .auth-form .heading {
+  color: var(--dark-text-color);
+  text-align: center;
+  font-family: var(--primary-font-family);
+  font-weight: 600;
+  font-size: 32px;
+  margin: 0;
+}
+#auth .auth-form .sub-heading {
+  text-align: center;
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  margin-top: -10px;
+}
+#auth .form-group {
   display: flex;
   flex-direction: column;
   gap: 5px;
+  position: relative;
 }
-#login .form-group label {
+#auth .form-group label {
   color: var(--dark-text-color);
   font-family: var(--text-font-family);
   font-weight: 500;
   font-size: 14px;
 }
-#login .form-group .required {
+#auth .form-group .required {
   color: crimson;
 }
-#login .form-group input {
+#auth .form-group input {
   color: var(--text-color);
   font-family: var(--text-font-family);
   font-weight: 400;
@@ -48,15 +79,30 @@
   border: var(--border);
   border-radius: 5px;
 }
-#login .form-group input:focus {
+#auth .form-group input:focus {
   border-color: var(--accent-color);
   background-color: #eef8ff;
 }
-#login .button-group {
-  display: flex;
-  gap: 10px;
+#auth .form-group .toggle-password {
+  outline: none;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  position: absolute;
+  top: 30px;
+  right: 10px;
+  font-size: 16px;
+  cursor: pointer;
 }
-#login .login-button {
+#auth .button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+#auth .action-button {
+  width: 100%;
+  max-width: 200px;
   outline: none;
   border: none;
   border-radius: 5px;
@@ -66,16 +112,22 @@
   cursor: pointer;
   transition: ease 0.3s;
 }
-#login .login-button:hover {
+#auth .action-button:hover {
   background-color: var(--primary-color);
 }
-#login .links a {
+#auth .links,
+#auth .links a {
   color: var(--text-color);
+  text-align: center;
   font-family: var(--text-font-family);
   font-weight: 400;
   font-size: 14px;
   transition: ease 0.3s;
 }
-#login .links a:hover {
+#auth .links a {
+  font-weight: 500;
+  color: var(--primary-color);
+}
+#auth .links a:hover {
   color: var(--accent-color);
 }

@@ -25,7 +25,8 @@ function customtheme_register_styles() {
         'customtheme-find-match-style'              => 'assets/css/find-match.css',
         'customtheme-featured-candidates-style'     => 'assets/css/featured-candidates.css',
         'customtheme-job-request-style'             => 'assets/css/job-request.css',
-        'customtheme-auth-style'             => 'assets/css/auth.css',
+        'customtheme-auth-style'                    => 'assets/css/auth.css',
+        'customtheme-candidate-portal-style'        => 'assets/css/candidate-portal.css',
     ];
 
     foreach ($styles as $handle => $path) {
@@ -58,6 +59,7 @@ function customtheme_register_scripts() {
     // Enqueue custom JavaScript files
     $scripts = [
         'customtheme-job-listing' => 'assets/js/job-listing.js',
+        'customtheme-auth' => 'assets/js/auth.js',
     ];
 
     foreach ($scripts as $handle => $path) {

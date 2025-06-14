@@ -5,11 +5,15 @@
 
 get_header();
 
-// Redirect logged-in users with candidate role
+// Redirect logged-in users
 if (is_user_logged_in()) {
     $current_user = wp_get_current_user();
+
     if (in_array('candidate', (array) $current_user->roles)) {
         wp_redirect(site_url('/candidate-dashboard'));
+        exit;
+    } elseif (!in_array('administrator', (array) $current_user->roles)) {
+        wp_redirect(site_url('/'));
         exit;
     }
 }
@@ -40,29 +44,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_login'])) {
 }
 ?>
 
-<div id="login">
+<div id="auth">
     <div class="container row">
         <div class="col">
-            <img class="login-banner"
+            <img class="auth-banner"
                 src="<?php echo esc_url(get_template_directory_uri() . '/assets/media/login.svg'); ?>"
                 alt="Login Illustration">
         </div>
         <div class="col">
-            <form method="post" class="candidate-login-form">
+            <form method="post" class="auth-form" autocomplete="off">
+                <h3 class="heading">Welcome Back</h3>
+                <p class="sub-heading">Login to access your candidate dashboard</p>
                 <div class="form-group">
-                    <label for="username">Email / Username <span class="required">*</span></label>
-                    <input type="text" name="username" required>
+                    <label for="username">Email or Username <span class="required">*</span></label>
+                    <input type="text" name="username" id="username" placeholder="Enter your email or username"
+                        required>
                 </div>
                 <div class="form-group">
                     <label for="password">Password <span class="required">*</span></label>
-                    <input type="password" name="password" required>
+                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
+                    <button type="button" class="toggle-password" aria-label="Toggle password visibility">
+                        <ion-icon name="eye-off-outline"></ion-icon>
+                    </button>
                 </div>
                 <div class="button-group">
-                    <input type="submit" name="candidate_login" value="Login" class="login-button">
+                    <input type="submit" name="candidate_login" value="Login" class="action-button">
                 </div>
                 <div class="links">
-                    <a href="<?php echo esc_url(site_url('/forget-password')); ?>">Forgot Password?</a> |
-                    <a href="<?php echo esc_url(site_url('/register')); ?>">Register</a>
+                    <p>Forgot password? <a href="<?php echo esc_url(site_url('/forget-password')); ?>">Reset</a></p>
+                    <p>Don't have an account? <a href="<?php echo esc_url(site_url('/register')); ?>">Register</a></p>
                 </div>
             </form>
         </div>

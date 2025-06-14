@@ -1,43 +1,24 @@
-<?php
-/**
- * Template Name: 404 Error Page
- * 
- * The template for displaying 404 pages (Not Found).
- * 
- * @package CustomTheme
- */
+<?php get_header(); ?>
 
-get_header(); // Include header.php
-?>
+<div id="auth">
+    <div class="container row">
+        <div class="col">
+            <img class="auth-banner"
+                src="<?php echo esc_url(get_template_directory_uri() . '/assets/media/404.svg'); ?>"
+                alt="404 Illustration">
+        </div>
+        <div class="col">
+            <div class="auth-form">
+                <h3 class="heading">Oops! Page Not Found</h3>
+                <p class="sub-heading">The page you’re looking for doesn’t exist or has been moved.</p>
 
-<main id="main-content" class="site-main">
-    <div class="container">
-        <section class="error-404 not-found">
-            <h1 class="page-title"><?php _e('Oops! That page can’t be found.', 'customtheme'); ?></h1>
-            <div class="page-content">
-                <p><?php _e('It looks like nothing was found at this location. Maybe try a search or check out the links below.', 'customtheme'); ?>
-                </p>
-
-                <?php get_search_form(); ?>
-
-                <div class="recent-posts">
-                    <h2><?php _e('Recent Posts', 'customtheme'); ?></h2>
-                    <ul>
-                        <?php
-                        $recent_posts = wp_get_recent_posts(['numberposts' => 5]);
-                        foreach ($recent_posts as $post) :
-                            ?>
-                        <li>
-                            <a href="<?php echo get_permalink($post['ID']); ?>">
-                                <?php echo esc_html($post['post_title']); ?>
-                            </a>
-                        </li>
-                        <?php endforeach; ?>
-                    </ul>
+                <div class="links">
+                    <p><a href="<?php echo esc_url(site_url('/')); ?>">Go to Homepage</a></p>
+                    <p>Need help? <a href="<?php echo esc_url(site_url('/contact')); ?>">Contact Support</a></p>
                 </div>
             </div>
-        </section>
+        </div>
     </div>
-</main>
+</div>
 
 <?php get_footer(); ?>
