@@ -2,8 +2,8 @@
 /**
  * Job Request Modal with AJAX Submission
  * Usage:
- * - Place [job_request_modal] anywhere OR auto-load via footer
- * - Use Elementor button with: data-request-job="1"
+ * - [job_request_modal] auto-loading via footer
+ * - Use Elementor button with custom attribute: data-request-job="1"
  */
 
 // ===== 1. Modal Shortcode Output ===== //
@@ -20,26 +20,39 @@ function render_job_request_modal() {
     <div class="modal-overlay"></div>
     <div class="modal-content">
         <span class="close-modal">&times;</span>
-        <h2>Request a Job Post</h2>
+        <h2 class="heading">Request a Job Post</h2>
         <form id="job-request-form">
-            <fieldset>
-                <legend>Recruiter Details</legend>
-                <label>Name *</label>
-                <input type="text" name="name" required>
-                <label>Email *</label>
-                <input type="email" name="email" required>
+            <h3 class="sub-heading">Recruiter Details</h3>
+
+            <div class="form-group">
+                <label>Name <span class="required">*<span></label>
+                <input type="text" name="name" placeholder="Enter your full name" required>
+            </div>
+
+            <div class="form-group">
+                <label>Email <span class="required">*<span></label>
+                <input type="email" name="email" placeholder="Enter your email address" required>
+            </div>
+
+            <div class="form-group">
                 <label>Phone</label>
-                <input type="text" name="phone">
-            </fieldset>
+                <input type="text" name="phone" placeholder="Include phone number">
+            </div>
 
-            <fieldset>
-                <legend>Job Details</legend>
-                <label>Title *</label>
-                <input type="text" name="job_title" required>
-                <label>Description *</label>
-                <textarea name="description" required></textarea>
+            <h3 class="sub-heading">Job Details</h3>
 
-                <?php
+            <div class="form-group">
+                <label>Title <span class="required">*<span></label>
+                <input type="text" name="job_title" placeholder="e.g. Senior Data Engineer" required>
+            </div>
+
+            <div class="form-group">
+                <label>Description <span class="required">*<span></label>
+                <textarea name="description" placeholder="Describe the role, responsibilities, and requirements"
+                    required></textarea>
+            </div>
+
+            <?php
                     $fields = [
                         'specialization' => ['label' => 'Specialization', 'options' => $skills],
                         'experience'     => ['label' => 'Years of Experience', 'options' => $experience],
@@ -50,21 +63,39 @@ function render_job_request_modal() {
                     ];
 
                     foreach ($fields as $name => $data) {
-                        $name_attr = !empty($data['multiple']) ? "{$name}[]" : $name;
-                        $multiple_attr = !empty($data['multiple']) ? 'multiple' : '';
-                        echo "<label>{$data['label']}</label>";
-                        echo "<select name='{$name_attr}' {$multiple_attr}>";
-                        foreach ($data['options'] as $term) {
-                            echo "<option value='" . esc_attr($term->name) . "'>" . esc_html($term->name) . "</option>";
-                        }
-                        echo "</select>";
-                    }
-                    ?>
-            </fieldset>
+                        $label = $data['label'] . ' <span class="required">*</span>';
 
-            <button type="submit">Request Job Post</button>
+                        if ($name === 'tools') {
+                            echo "<div class='checkbox-group'>";
+                            echo "<label>{$label}</label>";
+                            foreach ($data['options'] as $term) {
+                                $value = esc_attr($term->name);
+                                $term_label = esc_html($term->name);
+                                echo "<div class='checkbox-item'>";
+                                echo "<label><input type='checkbox' name='tools[]' value='{$value}'> {$term_label}</label>";
+                                echo "</div>";
+                            }
+                            echo "</div>";
+                        } else {
+                            $name_attr = !empty($data['multiple']) ? "{$name}[]" : $name;
+                            $multiple_attr = !empty($data['multiple']) ? 'multiple' : '';
+                            echo "<div class='select-group'>";
+                            echo "<label>{$label}</label>";
+                            echo "<select name='{$name_attr}' {$multiple_attr} required>";
+                            echo "<option value='' disabled selected>Select {$data['label']}</option>";
+                            foreach ($data['options'] as $term) {
+                                echo "<option value='" . esc_attr($term->name) . "'>" . esc_html($term->name) . "</option>";
+                            }
+                            echo "</select>";
+                            echo "</div>";
+                        }
+                    }
+
+                ?>
+
             <div class="loader" style="display:none;">Submitting...</div>
             <div class="confirmation" style="display:none; color:green;">Submitted successfully!</div>
+            <button type="submit">Request Job Post</button>
         </form>
     </div>
 </div>
@@ -97,7 +128,16 @@ function handle_job_request_email() {
 
     $form = [];
     foreach ($_POST['form_data'] as $item) {
-        $form[$item['name']] = sanitize_text_field($item['value']);
+        $name = $item['name'];
+        $value = $item['value'];
+
+        // Accumulate multiple values for fields like 'tools[]'
+        if (str_ends_with($name, '[]')) {
+            $base_name = rtrim($name, '[]');
+            $form[$base_name][] = sanitize_text_field($value);
+        } else {
+            $form[$name] = sanitize_text_field($value);
+        }
     }
 
     $admin_email = get_option('admin_email');
@@ -116,8 +156,9 @@ function handle_job_request_email() {
     $message .= "Location Preference: {$form['location']}\n";
     $message .= "Availability: {$form['availability']}\n";
     $message .= "Industry: {$form['industry']}\n";
-    $message .= "Languages & Tools: ";
-    $message .= is_array($form['tools']) ? implode(', ', $form['tools']) : $form['tools'];
+
+    $tools = isset($form['tools']) ? implode(', ', $form['tools']) : '';
+    $message .= "Languages & Tools: {$tools}\n";
 
     $subject = "New Job Request from {$form['name']}";
     $headers = ['Content-Type: text/plain; charset=UTF-8'];

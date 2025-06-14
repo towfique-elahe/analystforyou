@@ -1,0 +1,81 @@
+/* login template */
+#login {
+  width: 100%;
+  height: 80vh;
+}
+#login .container {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  margin: 0 auto;
+  align-items: center;
+  gap: 100px;
+}
+#login .login-banner {
+  width: 100%;
+  max-width: 500px;
+}
+#login .candidate-login-form {
+  background-color: #fff;
+  border: var(--border);
+  border-radius: 10px;
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+#login .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#login .form-group label {
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: 500;
+  font-size: 14px;
+}
+#login .form-group .required {
+  color: crimson;
+}
+#login .form-group input {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: 400;
+  font-size: 14px;
+  padding: 10px 15px;
+  outline: none;
+  border: var(--border);
+  border-radius: 5px;
+}
+#login .form-group input:focus {
+  border-color: var(--accent-color);
+  background-color: #eef8ff;
+}
+#login .button-group {
+  display: flex;
+  gap: 10px;
+}
+#login .login-button {
+  outline: none;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  color: #fff;
+  background-color: var(--accent-color);
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#login .login-button:hover {
+  background-color: var(--primary-color);
+}
+#login .links a {
+  color: var(--text-color);
+  font-family: var(--text-font-family);
+  font-weight: 400;
+  font-size: 14px;
+  transition: ease 0.3s;
+}
+#login .links a:hover {
+  color: var(--accent-color);
+}

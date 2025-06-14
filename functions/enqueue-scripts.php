@@ -24,6 +24,8 @@ function customtheme_register_styles() {
         'customtheme-job-listings-style'            => 'assets/css/job-listings.css',
         'customtheme-find-match-style'              => 'assets/css/find-match.css',
         'customtheme-featured-candidates-style'     => 'assets/css/featured-candidates.css',
+        'customtheme-job-request-style'             => 'assets/css/job-request.css',
+        'customtheme-auth-style'             => 'assets/css/auth.css',
     ];
 
     foreach ($styles as $handle => $path) {
