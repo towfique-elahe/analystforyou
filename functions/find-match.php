@@ -182,11 +182,10 @@ function render_find_match() {
         </form>
         <!-- New loader to show after clicking the Request button -->
         <div class="loader-message" style="display:none;">
-            <p>Submitting your request...</p>
-            <!-- <div class="loader"></div> -->
+            <p>📤 Sending your request. Please wait a moment...</p>
         </div>
         <div class="confirmation-message" style="display:none;">
-            <p>Thank you, your message has been sent to the admin. You'll be contacted shortly.</p>
+            <p>✅ Thank you! Your message has been delivered. The admin will contact you shortly.</p>
         </div>
     </div>
 
@@ -682,29 +681,68 @@ function handle_find_best_candidates() {
         wp_send_json_error(["error" => "Invalid JSON"]);
     }
 
-    // Send recruiter form data to admin via email
-    $recruiter = $selections['recruiter'] ?? [];
-    $admin_email = get_option('admin_email');
+// Send recruiter form data to admin via email
+$recruiter = $selections['recruiter'] ?? [];
+$admin_email = get_option('admin_email');
 
-    if ($recruiter && $admin_email) {
-        $subject = 'New Recruiter Match Request';
-        $message = "A recruiter has submitted a match request with the following details:\n\n";
-        $message .= "Name: " . sanitize_text_field($recruiter['name']) . "\n";
-        $message .= "Email: " . sanitize_email($recruiter['email']) . "\n";
-        $message .= "Phone: " . sanitize_text_field($recruiter['phone'] ?? '') . "\n\n";
+if ($recruiter && $admin_email) {
+    $subject = 'New Recruiter Match Request Received';
 
-        $message .= "Selections:\n";
-        $message .= "Specialization: " . ($selections['specialization'] ?? '') . "\n";
-        $message .= "Sub Role: " . ($selections['subrole'] ?? '') . "\n";
-        $message .= "Experience: " . ($selections['experience'] ?? '') . "\n";
-        $message .= "Availability: " . ($selections['availability'] ?? '') . "\n";
-        $message .= "Sector: " . ($selections['sector'] ?? '') . "\n";
-        $message .= "Tools: " . implode(', ', $selections['tools'] ?? []) . "\n";
+    $name = sanitize_text_field($recruiter['name'] ?? 'N/A');
+    $email = sanitize_email($recruiter['email'] ?? 'N/A');
+    $phone = sanitize_text_field($recruiter['phone'] ?? 'N/A');
 
-        $headers = ['Content-Type: text/plain; charset=UTF-8'];
+    $specialization = sanitize_text_field($selections['specialization'] ?? 'N/A');
+    $subrole = sanitize_text_field($selections['subrole'] ?? 'N/A');
+    $experience = sanitize_text_field($selections['experience'] ?? 'N/A');
+    $availability = sanitize_text_field($selections['availability'] ?? 'N/A');
+    $sector = sanitize_text_field($selections['sector'] ?? 'N/A');
+    $tools = !empty($selections['tools']) ? implode(', ', array_map('sanitize_text_field', $selections['tools'])) : 'None';
 
-        wp_mail($admin_email, $subject, $message, $headers);
-    }
+    $message = <<<EOT
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; color: #333; }
+    h2 { color: #2c3e50; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+    th { background-color: #f5f5f5; }
+  </style>
+</head>
+<body>
+  <h2>New Match Request from Recruiter</h2>
+  <p>Hello <strong>Admin</strong>,</p>
+  <p>A recruiter has submitted a new match request. Please review the details below:</p>
+
+  <h3>Recruiter Information:</h3>
+  <table>
+    <tr><th>Name</th><td>$name</td></tr>
+    <tr><th>Email</th><td>$email</td></tr>
+    <tr><th>Phone</th><td>$phone</td></tr>
+  </table>
+
+  <h3>Selections:</h3>
+  <table>
+    <tr><th>Specialization</th><td>$specialization</td></tr>
+    <tr><th>Sub Role</th><td>$subrole</td></tr>
+    <tr><th>Experience</th><td>$experience</td></tr>
+    <tr><th>Availability</th><td>$availability</td></tr>
+    <tr><th>Sector</th><td>$sector</td></tr>
+    <tr><th>Tools</th><td>$tools</td></tr>
+  </table>
+  
+</body>
+</html>
+EOT;
+
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+    ];
+
+    wp_mail($admin_email, $subject, $message, $headers);
+}
 
     error_log("Decoded selections: " . print_r($selections, true));
 
@@ -796,55 +834,77 @@ function handle_send_candidate_contact_request() {
         wp_send_json_error(['error' => 'Invalid JSON']);
     }
 
-    $name    = sanitize_text_field($decoded['name'] ?? '');
-    $company = sanitize_text_field($decoded['company'] ?? '');
-    $email   = sanitize_email($decoded['email'] ?? '');
-    $phone   = sanitize_text_field($decoded['phone'] ?? '');
-    $role    = sanitize_text_field($decoded['role'] ?? '');
-    $message = sanitize_textarea_field($decoded['message'] ?? '');
-    $urgency = sanitize_text_field($decoded['urgency'] ?? '');
-    $method  = sanitize_text_field($decoded['method'] ?? '');
+    $name    = sanitize_text_field($decoded['name'] ?? 'N/A');
+    $company = sanitize_text_field($decoded['company'] ?? 'N/A');
+    $email   = sanitize_email($decoded['email'] ?? 'N/A');
+    $phone   = sanitize_text_field($decoded['phone'] ?? 'N/A');
+    $role    = sanitize_text_field($decoded['role'] ?? 'N/A');
+    $message = sanitize_textarea_field($decoded['message'] ?? 'N/A');
+    $urgency = sanitize_text_field($decoded['urgency'] ?? 'N/A');
+    $method  = sanitize_text_field($decoded['method'] ?? 'N/A');
 
     $candidate = $decoded['candidate'] ?? [];
 
-    $candidate_id = sanitize_text_field($candidate['id'] ?? '');
+    $candidate_id = sanitize_text_field($candidate['id'] ?? 'N/A');
     $candidate_first_name = sanitize_text_field($candidate['first_name'] ?? '');
     $candidate_last_name = sanitize_text_field($candidate['last_name'] ?? '');
-    $candidate_name = trim("$candidate_first_name $candidate_last_name");
-    $candidate_spec = sanitize_text_field($candidate['specialization'] ?? '');
-    $candidate_subrole = sanitize_text_field($candidate['sub_role'] ?? '');
-    $candidate_exp = sanitize_text_field($candidate['experience'] ?? '');
-    $candidate_avail = sanitize_text_field($candidate['availability'] ?? '');
-    $candidate_sector = sanitize_text_field($candidate['sector'] ?? '');
-    $candidate_tools = is_array($candidate['tools']) ? implode(', ', array_map('sanitize_text_field', $candidate['tools'])) : '';
-    $candidate_bio = sanitize_textarea_field($candidate['bio'] ?? '');
+    $candidate_name = trim("$candidate_first_name $candidate_last_name") ?: 'N/A';
+    $candidate_spec = sanitize_text_field($candidate['specialization'] ?? 'N/A');
+    $candidate_subrole = sanitize_text_field($candidate['sub_role'] ?? 'N/A');
+    $candidate_exp = sanitize_text_field($candidate['experience'] ?? 'N/A');
+    $candidate_avail = sanitize_text_field($candidate['availability'] ?? 'N/A');
+    $candidate_sector = sanitize_text_field($candidate['sector'] ?? 'N/A');
+    $candidate_tools = is_array($candidate['tools']) ? implode(', ', array_map('sanitize_text_field', $candidate['tools'])) : 'N/A';
+    $candidate_bio = sanitize_textarea_field($candidate['bio'] ?? 'N/A');
 
-    $email_subject = "Recruiter Contact Request for Candidate Id: $candidate_id";
+    $email_subject = "Recruiter Contact Request for Candidate ID: $candidate_id";
 
-    $email_body = "Recruiter Contact Request\n\n";
-    $email_body .= "== Recruiter Details ==\n";
-    $email_body .= "Name: $name\n";
-    $email_body .= "Company: $company\n";
-    $email_body .= "Email: $email\n";
-    $email_body .= "Phone: $phone\n";
-    $email_body .= "Urgency: $urgency\n";
-    $email_body .= "Preferred Contact Method: $method\n\n";
-    $email_body .= "Message:\n$message\n\n";
+    $email_body = <<<EOT
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; color: #333; }
+    h2 { color: #2c3e50; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; vertical-align: top; }
+    th { background-color: #f2f2f2; width: 200px; }
+    p { margin: 0 0 10px; }
+  </style>
+</head>
+<body>
+  <h2>Contact Request from Recruiter</h2>
+  <p>Hello <strong>Admin</strong>,</p>
+  <p><strong>Candidate ID:</strong> $candidate_id</p>
 
-    $email_body .= "== Candidate Information ==\n";
-    $email_body .= "Candidate ID: $candidate_id\n";
-    $email_body .= "Name: $candidate_name\n";
-    $email_body .= "Specialization: $candidate_spec\n";
-    $email_body .= "Sub-role: $candidate_subrole\n";
-    $email_body .= "Experience: $candidate_exp\n";
-    $email_body .= "Availability: $candidate_avail\n";
-    $email_body .= "Sector: $candidate_sector\n";
-    $email_body .= "Tools: $candidate_tools\n";
-    $email_body .= "Bio: $candidate_bio\n";
+  <h3>Recruiter Details:</h3>
+  <table>
+    <tr><th>Name</th><td>$name</td></tr>
+    <tr><th>Company</th><td>$company</td></tr>
+    <tr><th>Email</th><td>$email</td></tr>
+    <tr><th>Phone</th><td>$phone</td></tr>
+    <tr><th>Urgency</th><td>$urgency</td></tr>
+    <tr><th>Preferred Contact Method</th><td>$method</td></tr>
+    <tr><th>Message</th><td>$message</td></tr>
+  </table>
 
-    error_log("Sending contact request email:\n" . $email_body);
+  <h3>Candidate Information:</h3>
+  <table>
+    <tr><th>Name</th><td>$candidate_name</td></tr>
+    <tr><th>Specialization</th><td>$candidate_spec</td></tr>
+    <tr><th>Sub-role</th><td>$candidate_subrole</td></tr>
+    <tr><th>Experience</th><td>$candidate_exp</td></tr>
+    <tr><th>Availability</th><td>$candidate_avail</td></tr>
+    <tr><th>Sector</th><td>$candidate_sector</td></tr>
+    <tr><th>Tools</th><td>$candidate_tools</td></tr>
+    <tr><th>Bio</th><td>$candidate_bio</td></tr>
+  </table>
 
-    $headers = ['Content-Type: text/plain; charset=UTF-8'];
+</body>
+</html>
+EOT;
+
+    $headers = ['Content-Type: text/html; charset=UTF-8'];
 
     $success = wp_mail($admin_email, $email_subject, $email_body, $headers);
 

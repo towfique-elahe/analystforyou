@@ -24,7 +24,7 @@ if (!in_array('candidate', (array) $current_user->roles)) {
         <div class="main">
             <?php get_template_part('template-parts/candidate/topbar'); ?>
             <div class="content">
-                <p>This is your dashboard. You can manage your profile from here.</p>
+                <p>This is your dashboard. You can manage your account from here.</p>
             </div>
         </div>
     </div>

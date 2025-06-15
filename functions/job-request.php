@@ -131,7 +131,7 @@ function handle_job_request_email() {
         $name = $item['name'];
         $value = $item['value'];
 
-        // Accumulate multiple values for fields like 'tools[]'
+        // Handle multi-value fields like tools[]
         if (str_ends_with($name, '[]')) {
             $base_name = rtrim($name, '[]');
             $form[$base_name][] = sanitize_text_field($value);
@@ -142,26 +142,63 @@ function handle_job_request_email() {
 
     $admin_email = get_option('admin_email');
 
-    $message = "New Job Post Request\n\n";
-    $message .= "== Recruiter ==\n";
-    $message .= "Name: {$form['name']}\n";
-    $message .= "Email: {$form['email']}\n";
-    $message .= "Phone: {$form['phone']}\n\n";
+    // Sanitize and fallback
+    $name = $form['name'] ?? 'N/A';
+    $email = $form['email'] ?? 'N/A';
+    $phone = $form['phone'] ?? 'N/A';
+    $job_title = $form['job_title'] ?? 'N/A';
+    $description = nl2br($form['description'] ?? 'N/A');
+    $specialization = $form['specialization'] ?? 'N/A';
+    $experience = $form['experience'] ?? 'N/A';
+    $location = $form['location'] ?? 'N/A';
+    $availability = $form['availability'] ?? 'N/A';
+    $industry = $form['industry'] ?? 'N/A';
+    $tools = isset($form['tools']) ? implode(', ', array_map('sanitize_text_field', $form['tools'])) : 'N/A';
 
-    $message .= "== Job Details ==\n";
-    $message .= "Title: {$form['job_title']}\n";
-    $message .= "Description: {$form['description']}\n";
-    $message .= "Specialization: {$form['specialization']}\n";
-    $message .= "Experience: {$form['experience']}\n";
-    $message .= "Location Preference: {$form['location']}\n";
-    $message .= "Availability: {$form['availability']}\n";
-    $message .= "Industry: {$form['industry']}\n";
+    $subject = "New Job Post Request from {$name}";
 
-    $tools = isset($form['tools']) ? implode(', ', $form['tools']) : '';
-    $message .= "Languages & Tools: {$tools}\n";
+    $message = <<<EOT
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; color: #333; }
+    h2 { color: #2c3e50; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+    th { background-color: #f4f4f4; width: 200px; }
+    p { margin: 0 0 10px; }
+  </style>
+</head>
+<body>
+  <h2>New Job Post Request</h2>
+  <p>Hello <strong>Admin</strong>,</p>
+  <p>A recruiter has submitted a new job posting. Please review the details below.</p>
 
-    $subject = "New Job Request from {$form['name']}";
-    $headers = ['Content-Type: text/plain; charset=UTF-8'];
+  <h3>Recruiter Information:</h3>
+  <table>
+    <tr><th>Name</th><td>{$name}</td></tr>
+    <tr><th>Email</th><td>{$email}</td></tr>
+    <tr><th>Phone</th><td>{$phone}</td></tr>
+  </table>
+
+  <h3>Job Details:</h3>
+  <table>
+    <tr><th>Title</th><td>{$job_title}</td></tr>
+    <tr><th>Description</th><td>{$description}</td></tr>
+    <tr><th>Specialization</th><td>{$specialization}</td></tr>
+    <tr><th>Experience</th><td>{$experience}</td></tr>
+    <tr><th>Location Preference</th><td>{$location}</td></tr>
+    <tr><th>Availability</th><td>{$availability}</td></tr>
+    <tr><th>Industry</th><td>{$industry}</td></tr>
+    <tr><th>Languages & Tools</th><td>{$tools}</td></tr>
+  </table>
+
+</body>
+</html>
+EOT;
+
+    $headers = ['Content-Type: text/html; charset=UTF-8'];
 
     $success = wp_mail($admin_email, $subject, $message, $headers);
 

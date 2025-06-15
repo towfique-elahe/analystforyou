@@ -8,8 +8,7 @@
 }
 .portal .container {
   width: 100%;
-  height: 100%;
-  min-height: 80vh;
+  height: 85vh;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
@@ -109,11 +108,200 @@
   border-radius: 50%;
 }
 .portal .main .content {
-  /* background-color: crimson; */
   width: 100%;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding-right: 10px;
   font-family: var(--text-font-family);
   font-size: 14px;
 }
-/* dashboard */
+
+/* profile management */
+#candidateProfile .row.profile-management-form {
+  gap: 15px;
+}
+#candidateProfile .col.personal-info {
+  flex: 2;
+}
+#candidateProfile .col.personal-info .row {
+  gap: 15px;
+}
+#candidateProfile .col.technical-info {
+  flex: 1;
+  border-left: var(--border);
+  padding-left: 15px;
+}
+#candidateProfile .form-heading {
+  color: var(--primary-color);
+  font-family: var(--primary-font-family);
+  font-weight: 500;
+  font-size: 18px;
+  border-left: solid 5px var(--primary-color);
+  padding-left: 5px;
+}
+#candidateProfile .update-image {
+  width: 200px;
+  height: 200px;
+  position: relative;
+}
+#candidateProfile .image-file-name {
+  width: 200px;
+  text-align: center;
+  font-size: 12px;
+}
+#candidateProfile .update-image .image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: var(--border);
+  border-radius: 5px;
+}
+#candidateProfile .update-image .buttons {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.384);
+  border-radius: 5px;
+}
+#candidateProfile .update-image:hover .buttons {
+  display: flex;
+}
+#candidateProfile .update-image .button {
+  outline: none;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  color: #fff;
+  font-size: 24px;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#candidateProfile .update-image .button.edit:hover {
+  color: var(--primary-color);
+}
+#candidateProfile .update-image .button.delete:hover {
+  color: crimson;
+}
+#candidateProfile .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--dark-text-color);
+  font-family: var(--text-font-family);
+  font-weight: 400;
+  font-size: 14px;
+}
+#candidateProfile .form-group label {
+  font-weight: 500;
+  font-size: 12px;
+}
+#candidateProfile .form-group .required {
+  color: crimson;
+}
+#candidateProfile .form-group input,
+#candidateProfile .form-group textarea,
+#candidateProfile .form-group select {
+  outline: none;
+  border: var(--border);
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 14px;
+}
+#candidateProfile .form-group input[type="file"] {
+  display: none;
+}
+#candidateProfile .form-group input:focus,
+#candidateProfile .form-group textarea:focus,
+#candidateProfile .form-group select:focus {
+  border-color: var(--accent-color);
+  background-color: #eef8ff;
+}
+#candidateProfile .form-group textarea {
+  resize: vertical;
+  height: 100px;
+}
+#candidateProfile .form-group select {
+  cursor: pointer;
+}
+#candidateProfile .checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 5px;
+}
+#candidateProfile .checkbox-item label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+#candidateProfile .button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  margin-top: 15px;
+}
+#candidateProfile .button-group .button {
+  outline: none;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--secondary-color);
+  color: var(--dark-text-color);
+  font-family: var(--acecnt-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#candidateProfile .button-group .button.update {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+#candidateProfile .button-group .button:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+#candidateProfile .update-cv {
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: var(--border);
+  border-radius: 5px;
+  background-color: var(--secondary-color);
+  color: var(--dark-text-color);
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer;
+  transition: ease 0.3s;
+}
+#candidateProfile .update-cv:hover {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+#candidateProfile .current-cv {
+  border: var(--border);
+  border-radius: 5px;
+  padding: 10px;
+  text-align: center;
+}
+#candidateProfile .current-cv a {
+  color: var(--accent-color);
+  transition: ease 0.3s;
+}
+#candidateProfile .current-cv a:hover {
+  color: var(--primary-color);
+}
+#candidateProfile .cv-file-name {
+  text-align: center;
+  font-size: 12px;
+}
