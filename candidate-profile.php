@@ -53,11 +53,146 @@ if (!empty($candidate['image'])) {
 // Load CV
 $cv_url = '';
 $cv_file_name = '';
-if (!empty($candidate['cv_id'])) {
-    $cv_src = wp_get_attachment_url($candidate['cv_id']);
-    if ($cv_src) {
-        $cv_url = esc_url($cv_src);
-        $cv_file_name = basename(get_attached_file($candidate['cv_id']));
+if (!empty($candidate['cv'])) {
+    $cv_raw = $candidate['cv'];
+    $cv_url = filter_var($cv_raw, FILTER_VALIDATE_URL) ? $cv_raw : site_url($cv_raw);
+    $cv_file_name = basename($cv_raw);
+}
+
+if (isset($_GET['updated']) && $_GET['updated'] === '1') {
+    $form_message = 'Profile updated successfully.';
+    $form_message_type = 'success';
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce']) && wp_verify_nonce($_POST['profile_update_nonce'], 'candidate_profile_update')) {
+    $errors = [];
+    $user_id = get_current_user_id();
+
+    // 1. Sanitize fields
+    $first_name = sanitize_text_field($_POST['first_name']);
+    $last_name = sanitize_text_field($_POST['last_name']);
+    $date_of_birth = sanitize_text_field($_POST['date_of_birth']);
+    $country = sanitize_text_field($_POST['country']);
+    $address = sanitize_text_field($_POST['address']);
+    $city = sanitize_text_field($_POST['city']);
+    $postal_code = sanitize_text_field($_POST['postal_code']);
+    $phone = sanitize_text_field($_POST['phone']);
+    $languages = sanitize_text_field($_POST['languages']);
+    $education = sanitize_text_field($_POST['education']);
+    $bio = sanitize_textarea_field($_POST['bio']);
+    $specialization = sanitize_text_field($_POST['specialization']);
+    $sub_role = sanitize_text_field($_POST['sub_role']);
+    $experience = sanitize_text_field($_POST['experience']);
+    $availability = sanitize_text_field($_POST['availability']);
+    $sector = sanitize_text_field($_POST['sector']);
+    $lang_tools = !empty($_POST['lang_tools']) ? implode(', ', array_map('sanitize_text_field', $_POST['lang_tools'])) : '';
+
+    // 2. Update user meta
+    wp_update_user([
+        'ID' => $user_id,
+        'first_name' => $first_name,
+        'last_name' => $last_name,
+    ]);
+
+    // 3. Handle image upload & deletion
+    $delete_image = isset($_POST['delete_image']) && $_POST['delete_image'] === '1';
+
+    if ($delete_image) {
+        if (!empty($candidate['image'])) {
+            $old_attachment_id = attachment_url_to_postid($candidate['image']);
+            if ($old_attachment_id) {
+                wp_delete_attachment($old_attachment_id, true);
+            }
+        }
+        $image_url = '';
+    } elseif (!empty($_FILES['image']['name'])) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+
+        $old_image_url = $candidate['image'] ?? '';
+        $uploaded_image = media_handle_upload('image', 0);
+        if (!is_wp_error($uploaded_image)) {
+            $image_url = wp_get_attachment_url($uploaded_image);
+
+            if (!empty($old_image_url)) {
+                $old_attachment_id = attachment_url_to_postid($old_image_url);
+                if ($old_attachment_id) {
+                    wp_delete_attachment($old_attachment_id, true);
+                }
+            }
+        } else {
+            $errors[] = 'Image upload failed.';
+            $image_url = $candidate['image'] ?? ''; // fallback to existing image on error
+        }
+    } else {
+        $image_url = $candidate['image'] ?? ''; // no upload, no deletion — keep old image
+    }
+
+    // 4. Handle CV upload
+    $cv_id = 0;
+    if (!empty($_FILES['cv']['name'])) {
+        require_once ABSPATH . 'wp-admin/includes/file.php';
+        require_once ABSPATH . 'wp-admin/includes/media.php';
+        require_once ABSPATH . 'wp-admin/includes/image.php';
+
+        $uploaded_cv = media_handle_upload('cv', 0);
+
+        if (!is_wp_error($uploaded_cv)) {
+            // ✅ Delete old CV if it exists
+            if (!empty($candidate['cv'])) {
+                $old_cv_id = attachment_url_to_postid($candidate['cv']);
+                if ($old_cv_id) {
+                    wp_delete_attachment($old_cv_id, true);
+                }
+            }
+
+            $cv_id = $uploaded_cv;
+        } else {
+            $errors[] = 'CV upload failed.';
+        }
+    }
+
+    // 5. Update DB
+    if (empty($errors)) {
+        $result = $wpdb->update(
+            "{$wpdb->prefix}candidates",
+            [
+                'first_name'      => $first_name,
+                'last_name'       => $last_name,
+                'date_of_birth'   => $date_of_birth,
+                'country'         => $country,
+                'address'         => $address,
+                'city'            => $city,
+                'postal_code'     => $postal_code,
+                'phone'           => $phone,
+                'languages'       => $languages,
+                'education'       => $education,
+                'bio'             => $bio,
+                'specialization'  => $specialization,
+                'sub_role'        => $sub_role,
+                'experience'      => $experience,
+                'availability'    => $availability,
+                'sector'          => $sector,
+                'lang_tools'      => $lang_tools,
+                'image'           => $image_url,
+                'cv'              => !empty($cv_id) ? wp_get_attachment_url($cv_id) : $candidate['cv'],
+            ],
+            ['id' => $user_id],
+            null,
+            ['%d']
+        );
+
+        if ($result !== false) {
+            wp_redirect(add_query_arg('updated', '1', get_permalink()));
+            exit;
+        } else {
+            $form_message = 'No changes made.';
+            $form_message_type = 'success';
+        }
+    } else {
+        $form_message = implode('<br>', $errors);
+        $form_message_type = 'error';
     }
 }
 
@@ -69,15 +204,24 @@ if (!empty($candidate['cv_id'])) {
         <div class="main">
             <?php get_template_part('template-parts/candidate/topbar'); ?>
             <div class="content">
-                <form action="" class="row profile-management-form">
+                <form action="" method="post" enctype="multipart/form-data" class="row profile-management-form">
+                    <input type="hidden" name="profile_update_nonce"
+                        value="<?php echo wp_create_nonce('candidate_profile_update'); ?>">
+                    <?php if (!empty($form_message)): ?>
+                    <div class="form-message <?php echo esc_attr($form_message_type); ?>" style="display: block;">
+                        <?php echo esc_html($form_message); ?>
+                    </div>
+                    <?php endif; ?>
+                    <div class="form-message" style="display:none;"></div>
                     <div class="col personal-info">
                         <h3 class="form-heading">Personal Information</h3>
 
                         <div class="form-group">
                             <label for="">Image</label>
-                            <input type="file" name="image" id="image">
                             <div class="update-image">
                                 <img src="<?php echo $image_url; ?>" alt="Profile Image" class="image">
+                                <input type="file" name="image" id="image" accept="image/jpeg, image/png">
+                                <input type="hidden" name="delete_image" id="deleteImage" value="0">
                                 <div class="buttons">
                                     <label for="image" class="button edit">
                                         <ion-icon name="create-outline"></ion-icon>
@@ -87,7 +231,8 @@ if (!empty($candidate['cv_id'])) {
                                     </a>
                                 </div>
                             </div>
-                            <p class="image-file-name"><?php echo esc_html($image_file_name); ?></p>
+                            <p class="image-file-name" style="display: none;"></p>
+                            <small class="file-hint">Max 5MB. JPG or PNG only.</small>
                         </div>
 
                         <div class="row">
@@ -406,17 +551,16 @@ if (!empty($candidate['cv_id'])) {
 
                         <div class="form-group">
                             <label for="">CV</label>
+                            <?php if ($cv_file_name && $cv_url): ?>
                             <p class="current-cv">
-                                <?php if ($cv_file_name): ?>
                                 <?php echo esc_html($cv_file_name); ?> |
-                                <a href="<?php echo $cv_url; ?>" target="_blank">View</a>
-                                <?php else: ?>
-                                No file uploaded
-                                <?php endif; ?>
+                                <a href="<?php echo esc_url($cv_url); ?>" target="_blank">View</a>
                             </p>
+                            <?php endif; ?>
                             <input type="file" name="cv" id="cv" accept="application/pdf">
                             <label for="cv" class="update-cv">Upload CV</label>
-                            <p class="cv-file-name"><?php echo esc_html($cv_file_name); ?></p>
+                            <p class="cv-file-name" style="display: none;"></p>
+                            <small class="file-hint">Max 2MB. PDF only.</small>
                         </div>
 
                         <div class="form-group">
@@ -587,6 +731,128 @@ if (!empty($candidate['cv_id'])) {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide PHP-rendered success message and clear ?updated=1 from URL
+    const autoHideMessage = document.querySelector('.form-message.success');
+    if (autoHideMessage && autoHideMessage.textContent.trim() !== '') {
+        setTimeout(() => {
+            autoHideMessage.style.display = 'none';
+            autoHideMessage.textContent = '';
+
+            // Remove ?updated=1 from URL without reloading
+            const url = new URL(window.location.href);
+            url.searchParams.delete('updated');
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+        }, 5000);
+    }
+
+    const imageInput = document.getElementById('image');
+    const imageFileNameDisplay = document.querySelector('.image-file-name');
+    const previewImage = document.querySelector('.update-image img');
+
+    const cvInput = document.getElementById('cv');
+    const cvFileNameDisplay = document.querySelector('.cv-file-name');
+
+    const messageBox = document.querySelector('.form-message');
+
+    function showMessage(msg, type = 'success') {
+        messageBox.textContent = msg;
+        messageBox.className = `form-message ${type}`;
+        messageBox.style.display = 'block';
+        messageBox.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+        });
+
+        setTimeout(() => {
+            messageBox.textContent = '';
+            messageBox.style.display = 'none';
+        }, 5000);
+    }
+
+    imageInput.addEventListener('change', function() {
+        const file = imageInput.files[0];
+        if (!file) return;
+
+        const allowedTypes = ['image/jpeg', 'image/png'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+
+        if (!allowedTypes.includes(file.type)) {
+            showMessage('Only JPG or PNG images are allowed.', 'error');
+            imageInput.value = '';
+            imageFileNameDisplay.textContent = '';
+            imageFileNameDisplay.style.display = 'none';
+            previewImage.src = '<?php echo get_template_directory_uri(); ?>/assets/media/user.png';
+            return;
+        }
+
+        if (file.size > maxSize) {
+            showMessage('Image must be smaller than 5MB.', 'error');
+            imageInput.value = '';
+            imageFileNameDisplay.textContent = '';
+            imageFileNameDisplay.style.display = 'none';
+            previewImage.src = '<?php echo get_template_directory_uri(); ?>/assets/media/user.png';
+            return;
+        }
+
+        imageFileNameDisplay.textContent = file.name;
+        imageFileNameDisplay.style.display = 'block';
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+
+        showMessage('Image selected successfully.', 'success');
+    });
+
+    const deleteImageBtn = document.querySelector('.update-image .delete');
+    const deleteImageInput = document.getElementById('deleteImage');
+
+    deleteImageBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const confirmDelete = confirm('Are you sure you want to delete the profile image?');
+        if (!confirmDelete) return;
+
+        previewImage.src = '<?php echo get_template_directory_uri(); ?>/assets/media/user.png';
+        imageInput.value = '';
+        imageFileNameDisplay.textContent = '';
+        imageFileNameDisplay.style.display = 'none';
+        deleteImageInput.value = '1';
+
+        showMessage('Image marked for deletion. Click "Update" to confirm.', 'success');
+    });
+
+    cvInput.addEventListener('change', function() {
+        const file = cvInput.files[0];
+        if (!file) return;
+
+        const allowedType = 'application/pdf';
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        if (file.type !== allowedType) {
+            showMessage('Only PDF files are allowed for CV.', 'error');
+            cvInput.value = '';
+            cvFileNameDisplay.textContent = '';
+            cvFileNameDisplay.style.display = 'none';
+            return;
+        }
+
+        if (file.size > maxSize) {
+            showMessage('CV must be smaller than 2MB.', 'error');
+            cvInput.value = '';
+            cvFileNameDisplay.textContent = '';
+            cvFileNameDisplay.style.display = 'none';
+            return;
+        }
+
+        cvFileNameDisplay.textContent = file.name;
+        cvFileNameDisplay.style.display = 'block';
+
+        showMessage('CV selected successfully.', 'success');
+    });
+
     const subrolesMap = {
         "Data Analyst": [
             "Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
@@ -607,8 +873,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ],
         "Data Engineer": [
             "ETL Developer", "Analytics Engineer", "Data Platform Engineer",
-            "Data Integration Specialist",
-            "Data Architect", "Data Quality Analyst", "Data Steward"
+            "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
         ],
         "Information Analyst": [
             "Functional Analyst", "Technical Analyst", "Systems Analyst",
@@ -619,7 +884,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const specializationSelect = document.getElementById('specialization');
     const subRoleSelect = document.getElementById('subRole');
 
-    // Inject saved values from PHP to JS
     const selectedSpecialization = "<?php echo esc_js($selected_specialization); ?>";
     const selectedSubRole = "<?php echo esc_js($selected_sub_role); ?>";
 
@@ -638,12 +902,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initial population based on saved specialization
     if (selectedSpecialization) {
         populateSubRoles(selectedSpecialization, selectedSubRole);
     }
 
-    // On specialization change
     specializationSelect.addEventListener('change', function() {
         populateSubRoles(this.value, '');
     });

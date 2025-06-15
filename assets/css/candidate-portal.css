@@ -121,6 +121,25 @@
 #candidateProfile .row.profile-management-form {
   gap: 15px;
 }
+#candidateProfile .form-message,
+#candidateProfile .form-message.success {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  z-index: 1000;
+  border: var(--border);
+  border-radius: 5px;
+  background: rgb(222, 255, 222);
+  color: var(--dark-text-color);
+  font-family: var(--acecnt-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease-in-out;
+}
+#candidateProfile .form-message.error {
+  background: rgb(255, 234, 234);
+}
 #candidateProfile .col.personal-info {
   flex: 2;
 }
@@ -213,10 +232,23 @@
   border: var(--border);
   border-radius: 5px;
   padding: 10px 15px;
+  font-family: var(--text-font-family);
+  font-weight: 400;
   font-size: 14px;
 }
 #candidateProfile .form-group input[type="file"] {
   display: none;
+}
+#candidateProfile input:read-only,
+#candidateProfile input:read-only:focus {
+  background-color: #f9f9f9;
+  color: #888;
+  border: 1px solid #ccc;
+  cursor: not-allowed;
+}
+#candidateProfile .form-group input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--accent-color);
 }
 #candidateProfile .form-group input:focus,
 #candidateProfile .form-group textarea:focus,
