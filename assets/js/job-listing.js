@@ -54,3 +54,29 @@ jQuery(document).ready(function ($) {
     // Initial load
     fetchJobs();
 });
+
+jQuery(document).ready(function ($) {
+  $('.mobile-filter-toggle').on('click', function () {
+    $('.custom-job-listing .sidebar').toggleClass('active');
+  });
+
+  $('.close-sidebar').on('click', function () {
+    $('.custom-job-listing .sidebar').removeClass('active');
+  });
+
+  // Optional: Close sidebar on outside click or Esc
+  $(document).on('click', function (e) {
+    if (
+      $('.custom-job-listing .sidebar').hasClass('active') &&
+      !$(e.target).closest('.sidebar, .mobile-filter-toggle').length
+    ) {
+      $('.custom-job-listing .sidebar').removeClass('active');
+    }
+  });
+
+  $(document).on('keydown', function (e) {
+    if (e.key === 'Escape') {
+      $('.custom-job-listing .sidebar').removeClass('active');
+    }
+  });
+});

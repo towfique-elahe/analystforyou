@@ -14,6 +14,7 @@ function render_custom_job_listing() {
     <div class="container">
         <!-- Sidebar Filters -->
         <div class="col sidebar">
+            <a href="javascript:void(0)" class="close-sidebar" style="display:none;">×</a>
             <div class="sidebar-header">
                 <h3 class="sidebar-heading">Filters</h3>
                 <a href="javascript:void()" class="reset-button">Reset</a>
@@ -62,6 +63,10 @@ function render_custom_job_listing() {
                 <!-- header -->
                 <div class="row content-header">
                     <div class="col">
+                        <!-- Filter Toggle for Mobile -->
+                        <div class="mobile-filter-toggle">
+                            <ion-icon name="options-outline"></ion-icon> <span>Filters</span>
+                        </div>
                         <p class="showing-text">
                             <!-- Showing <strong>41</strong>-<strong>60</strong> of <strong>944</strong> jobs -->
                         </p>

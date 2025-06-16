@@ -28,7 +28,7 @@
 #findMatch .container.match-container {
   max-width: 100%;
   border: none;
-  padding: none;
+  padding: 0;
   background-color: transparent;
 }
 #findMatch .heading {
@@ -184,6 +184,7 @@
 #findMatch .match-cards {
   margin-top: 20px;
   display: flex;
+  justify-content: center;
   flex-wrap: wrap;
   gap: 20px;
 }
@@ -210,8 +211,8 @@
   justify-content: center;
 }
 #findMatch .match-cards .card .avatar-container {
-  width: 120px;
-  height: 120px;
+  width: 90px;
+  height: 90px;
   border-radius: 50%;
   border: var(--border);
 }
@@ -291,4 +292,28 @@
   font-weight: 500;
   font-size: 16px;
   text-align: center;
+}
+@media screen and (max-width: 980px) {
+  #findMatch .match-cards .card {
+    width: calc(50% - 40px);
+    max-width: 350px;
+  }
+}
+@media screen and (max-width: 715px) {
+  #findMatch .match-cards .cards {
+    gap: 15px;
+  }
+  #findMatch .match-cards .card {
+    width: calc(50% - 10px);
+  }
+}
+@media screen and (max-width: 625px) {
+  #findMatch .match-cards .card {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 425px) {
+  #findMatch .button-group {
+    flex-direction: column;
+  }
 }
