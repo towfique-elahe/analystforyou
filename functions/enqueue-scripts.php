@@ -60,6 +60,7 @@ function customtheme_register_scripts() {
     $scripts = [
         'customtheme-job-listing' => 'assets/js/job-listing.js',
         'customtheme-auth' => 'assets/js/auth.js',
+        'customtheme-single-job' => 'assets/js/single-job.js',
     ];
 
     foreach ($scripts as $handle => $path) {
