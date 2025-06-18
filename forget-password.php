@@ -55,12 +55,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_reset'])) {
 
 <div id="auth">
     <div class="container row">
-        <div class="col">
+        <div class="col auth-banner-container">
             <img class="auth-banner"
                 src="<?php echo esc_url(get_template_directory_uri() . '/assets/media/forgot-password.svg'); ?>"
                 alt="Forgot Password Illustration">
         </div>
-        <div class="col">
+        <div class="col auth-form-container">
             <form method="post" class="auth-form" autocomplete="off">
                 <h3 class="heading">Forgot Your Password?</h3>
                 <p class="sub-heading">Enter your email or username and we’ll send a reset link.</p>

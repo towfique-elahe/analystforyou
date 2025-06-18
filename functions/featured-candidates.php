@@ -70,7 +70,7 @@ function render_featured_candidates($atts) {
 
     $table = $wpdb->prefix . "candidates";
     $placeholders = implode(',', array_fill(0, count($ids), '%d'));
-    $query = "SELECT * FROM $table WHERE id IN ($placeholders) AND status = 'Approved'";
+    $query = "SELECT * FROM $table WHERE id IN ($placeholders)";
     $results = $wpdb->get_results($wpdb->prepare($query, ...$ids), ARRAY_A);
 
     if (!$results) return '<p>No matching candidates found.</p>';
@@ -79,6 +79,7 @@ function render_featured_candidates($atts) {
     echo '<div class="featured-candidates">';
 
     foreach ($results as $candidate) {
+        $image_url = !empty($candidate['image']) ? esc_url($candidate['image']) : get_template_directory_uri() . '/assets/media/user.png';
         $firstInitial = strtoupper(substr($candidate['first_name'], 0, 1));
         $lastObfuscated = obfuscate_last_name($candidate['last_name']);
         $tools = array_map('trim', explode(',', $candidate['lang_tools']));
@@ -89,7 +90,7 @@ function render_featured_candidates($atts) {
             <div class='row head'>
                 <div class='col'>
                     <div class='avatar-container'>
-                        <div class='avatar' style='background-color: " . string_to_color($candidate['first_name']) . "'>$firstInitial</div>
+                        <img src='$image_url' alt='Profile Image' class='avatar-image'>
                     </div>
                 </div>
                 <div class='col'>
@@ -109,9 +110,9 @@ function render_featured_candidates($atts) {
                 <p><strong>Sector:</strong> {$candidate['sector']}</p>
             </div>
         </div>";
-    }
+}
 
-    echo '</div>';
-    return ob_get_clean();
+echo '</div>';
+return ob_get_clean();
 }
 add_shortcode('featured_candidates', 'render_featured_candidates');

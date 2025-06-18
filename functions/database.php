@@ -6,7 +6,7 @@
 function create_custom_tables() {
     global $wpdb;
 
-    $custom_tables_version = '1.0.2';
+    $custom_tables_version = '1.0.3';
     $installed_version = get_option('custom_tables_version');
 
     if ($installed_version === $custom_tables_version) {
@@ -19,7 +19,7 @@ function create_custom_tables() {
     // SQL to create candidates table
     $candidates_sql = "CREATE TABLE $candidates_table (
         id BIGINT(20) UNSIGNED NOT NULL,
-        status ENUM('In Review', 'Rejected', 'Approved') NOT NULL DEFAULT 'In Review',
+        status ENUM('Private', 'Public') NOT NULL DEFAULT 'Private',
         first_name VARCHAR(255) NOT NULL,
         last_name VARCHAR(255) NULL,
         date_of_birth DATE NULL,

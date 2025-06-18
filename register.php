@@ -85,12 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_register'])
 
 <div id="auth">
     <div class="container row">
-        <div class="col">
+        <div class="col auth-banner-container">
             <img class="auth-banner"
                 src="<?php echo esc_url(get_template_directory_uri() . '/assets/media/register.svg'); ?>"
                 alt="Login Illustration">
         </div>
-        <div class="col">
+        <div class="col auth-form-container">
             <form method="post" class="auth-form" autocomplete="off">
                 <h3 class="heading">Create Your Candidate Profile</h3>
                 <p class="sub-heading">It only takes a minute to register. Start your journey with us!</p>

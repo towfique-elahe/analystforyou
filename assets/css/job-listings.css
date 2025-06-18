@@ -336,6 +336,6 @@
     justify-content: center;
   }
   #jobListing .job {
-    max-width: 350px;
+    max-width: 100%;
   }
 }

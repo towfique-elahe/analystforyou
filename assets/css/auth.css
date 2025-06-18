@@ -1,4 +1,9 @@
 /* auth template */
+#auth * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 #auth {
   width: 100%;
 }
@@ -6,9 +11,14 @@
   width: 100%;
   max-width: 1200px;
   min-height: 80vh;
+  padding: 15px;
   margin: 0 auto;
   align-items: center;
   gap: 100px;
+}
+#auth .auth-banner-container {
+  align-items: center;
+  justify-content: center;
 }
 #auth .auth-banner {
   width: 100%;
@@ -130,4 +140,17 @@
 }
 #auth .links a:hover {
   color: var(--accent-color);
+}
+@media screen and (max-width: 1120px) {
+  #auth .container {
+    gap: 50px;
+  }
+  #auth .auth-form-container {
+    flex: 1.5;
+  }
+}
+@media screen and (max-width: 767px) {
+  #auth .auth-banner-container {
+    display: none;
+  }
 }

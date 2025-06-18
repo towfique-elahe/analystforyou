@@ -8,10 +8,10 @@
 }
 .portal .container {
   width: 100%;
-  height: 85vh;
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
+  align-items: flex-start;
   gap: 15px;
 }
 .portal .sidebar {
@@ -27,12 +27,14 @@
   background-color: #fff;
   border: var(--border);
   border-radius: 10px;
+  min-height: 50vh;
 }
 .portal .sidebar {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 20px;
+  min-height: 50vh;
 }
 .portal .sidebar .top,
 .portal .sidebar .bottom {
@@ -110,11 +112,36 @@
 .portal .main .content {
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  overflow-y: scroll;
-  padding-right: 10px;
   font-family: var(--text-font-family);
   font-size: 14px;
+}
+@media screen and (max-width: 1210px) {
+  .portal .container {
+    padding: 0 15px;
+  }
+}
+@media screen and (max-width: 1175px) {
+  .portal .sidebar .welcome-message {
+    display: none;
+  }
+  .portal .sidebar .menu-item .text {
+    display: none;
+  }
+  .portal .sidebar {
+    width: fit-content;
+  }
+  .portal .main {
+    width: 100%;
+  }
+}
+@media screen and (max-width: 767px) {
+  .portal .container {
+    gap: 10px;
+  }
+  .portal .sidebar,
+  .portal .main {
+    padding: 10px;
+  }
 }
 
 /* profile management */
@@ -236,6 +263,21 @@
   font-weight: 400;
   font-size: 14px;
 }
+#candidateProfile .form-group select[multiple] {
+  width: 100%;
+  min-height: 145px;
+  padding: 10px;
+}
+#candidateProfile .form-group select[multiple] option {
+  padding: 6px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-bottom: 5px;
+}
+#candidateProfile .form-group select[multiple] option:checked {
+  background-color: var(--accent-color);
+  color: #fff;
+}
 #candidateProfile .form-group input[type="file"] {
   display: none;
 }
@@ -243,12 +285,7 @@
 #candidateProfile input:read-only:focus {
   background-color: #f9f9f9;
   color: #888;
-  border: 1px solid #ccc;
   cursor: not-allowed;
-}
-#candidateProfile .form-group input[type="checkbox"] {
-  cursor: pointer;
-  accent-color: var(--accent-color);
 }
 #candidateProfile .form-group input:focus,
 #candidateProfile .form-group textarea:focus,
@@ -268,6 +305,10 @@
   flex-direction: column;
   gap: 7px;
   margin-top: 5px;
+}
+#candidateProfile .checkbox-group input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--accent-color);
 }
 #candidateProfile .checkbox-item label {
   display: flex;
@@ -336,4 +377,18 @@
 #candidateProfile .cv-file-name {
   text-align: center;
   font-size: 12px;
+}
+@media screen and (max-width: 890px) {
+  #candidateProfile .profile-management-form {
+    flex-direction: column;
+  }
+  #candidateProfile .technical-info {
+    padding: 0 !important;
+    border: none !important;
+  }
+}
+@media screen and (max-width: 767px) {
+  #candidateProfile .profile-management-form .row {
+    flex-direction: column;
+  }
 }

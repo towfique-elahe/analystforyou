@@ -1,7 +1,8 @@
 .featured-candidates {
+  width: 100%;
+  max-width: 1200px;
   margin-top: 20px;
   display: flex;
-  align-items: center;
   justify-content: center;
   flex-wrap: wrap;
   gap: 20px;
@@ -20,13 +21,14 @@
 }
 .candidate-card .col:last-of-type {
   flex: 1.5;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .candidate-card .avatar-container {
   width: 120px;
   height: 120px;
   border-radius: 50%;
   border: var(--border);
+  overflow: hidden;
 }
 .candidate-card .avatar {
   font-size: 48px;
@@ -89,10 +91,24 @@
   .candidate-card .avatar-container {
     width: 90px;
     height: 90px;
-    border-radius: 50%;
-    border: var(--border);
   }
   .candidate-card .avatar {
     font-size: 32px;
+  }
+}
+@media only screen and (max-width: 649px) {
+  .candidate-card {
+    width: 100%;
+    max-width: 415px;
+  }
+  .candidate-card .avatar-container {
+    width: 120px;
+    height: 120px;
+  }
+}
+@media only screen and (max-width: 425px) {
+  .candidate-card .avatar-container {
+    width: 100px;
+    height: 100px;
   }
 }

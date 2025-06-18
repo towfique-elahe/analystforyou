@@ -756,7 +756,7 @@ EOT;
     $table = $wpdb->prefix . "candidates";
 
     // Start query
-    $query = "SELECT * FROM $table WHERE status = 'Approved'";
+    $query = "SELECT * FROM $table WHERE status = 'Public'";
     $params = [];
 
     if ($specialization) {

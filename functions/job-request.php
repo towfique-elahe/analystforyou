@@ -208,3 +208,12 @@ EOT;
         wp_send_json_error();
     }
 }
+
+// job post request trigger from mobile menu
+function add_data_attribute_to_menu_link($atts, $item, $args, $depth) {
+    if (in_array('job-request-trigger', $item->classes)) {
+        $atts['data-request-job'] = '1';
+    }
+    return $atts;
+}
+add_filter('nav_menu_link_attributes', 'add_data_attribute_to_menu_link', 10, 4);
