@@ -68,3 +68,15 @@ function customtheme_register_scripts() {
     }
 }
 add_action('wp_enqueue_scripts', 'customtheme_register_scripts');
+
+// Register and enqueue wp admin styles
+function customtheme_admin_styles($hook) {
+    // Only load on specific admin pages if needed, or load globally
+    wp_enqueue_style(
+        'customtheme-wp-dashboard-style',
+        get_template_directory_uri() . '/assets/css/wp-dashboard.css',
+        [],
+        wp_get_theme()->get('Version')
+    );
+}
+add_action('admin_enqueue_scripts', 'customtheme_admin_styles');

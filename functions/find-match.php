@@ -566,10 +566,13 @@ document.addEventListener("DOMContentLoaded", function() {
                                         id: candidateData.id,
                                         first_name: candidateData.first_name,
                                         last_name: candidateData.last_name,
+                                        email: candidateData.email,
+                                        phone: candidateData.phone,
+                                        country: candidateData.country,
                                         specialization: candidateData
                                             .specialization,
                                         sub_role: candidateData
-                                            .sub_role, // This is the role
+                                            .sub_role,
                                         experience: candidateData.experience,
                                         availability: candidateData.availability,
                                         sector: candidateData.sector,
@@ -849,6 +852,9 @@ function handle_send_candidate_contact_request() {
     $candidate_first_name = sanitize_text_field($candidate['first_name'] ?? '');
     $candidate_last_name = sanitize_text_field($candidate['last_name'] ?? '');
     $candidate_name = trim("$candidate_first_name $candidate_last_name") ?: 'N/A';
+    $candidate_email = sanitize_email($candidate['email'] ?? 'N/A');
+    $candidate_phone = sanitize_text_field($candidate['phone'] ?? 'N/A');
+    $candidate_country = sanitize_text_field($candidate['country'] ?? 'N/A');
     $candidate_spec = sanitize_text_field($candidate['specialization'] ?? 'N/A');
     $candidate_subrole = sanitize_text_field($candidate['sub_role'] ?? 'N/A');
     $candidate_exp = sanitize_text_field($candidate['experience'] ?? 'N/A');
@@ -891,6 +897,9 @@ function handle_send_candidate_contact_request() {
   <h3>Candidate Information:</h3>
   <table>
     <tr><th>Name</th><td>$candidate_name</td></tr>
+    <tr><th>Email</th><td>$candidate_email</td></tr>
+    <tr><th>Phone</th><td>$candidate_phone</td></tr>
+    <tr><th>Country</th><td>$candidate_country</td></tr>
     <tr><th>Specialization</th><td>$candidate_spec</td></tr>
     <tr><th>Sub-role</th><td>$candidate_subrole</td></tr>
     <tr><th>Experience</th><td>$candidate_exp</td></tr>

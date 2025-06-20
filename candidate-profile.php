@@ -36,18 +36,20 @@ $selected_availability = $candidate['availability'] ?? '';
 $selected_sector = $candidate['sector'] ?? '';
 $checked_lang_tools = !empty($candidate['lang_tools']) ? array_map('trim', explode(',', $candidate['lang_tools'])) : [];
 
-// Default fallback image
-$image_url = get_template_directory_uri() . '/assets/media/user.png';
+// Default fallback avatar
+$default_avatar = 'user.png';
+$image_url = get_template_directory_uri() . '/assets/media/' . $default_avatar;
 $image_file_name = '';
 
 if (!empty($candidate['image'])) {
-    // Use as full URL or relative path based on what's stored
     if (filter_var($candidate['image'], FILTER_VALIDATE_URL)) {
         $image_url = esc_url($candidate['image']);
     } else {
         $image_url = esc_url(site_url($candidate['image']));
     }
     $image_file_name = basename($candidate['image']);
+} else {
+    $image_file_name = $default_avatar;
 }
 
 // Load CV
@@ -95,64 +97,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
         'last_name' => $last_name,
     ]);
 
-    // 3. Handle image upload & deletion
-    $delete_image = isset($_POST['delete_image']) && $_POST['delete_image'] === '1';
-
-    if ($delete_image) {
-        if (!empty($candidate['image'])) {
-            $old_attachment_id = attachment_url_to_postid($candidate['image']);
-            if ($old_attachment_id) {
-                wp_delete_attachment($old_attachment_id, true);
-            }
-        }
-        $image_url = '';
-    } elseif (!empty($_FILES['image']['name'])) {
-        require_once ABSPATH . 'wp-admin/includes/file.php';
-        require_once ABSPATH . 'wp-admin/includes/media.php';
-        require_once ABSPATH . 'wp-admin/includes/image.php';
-
-        $old_image_url = $candidate['image'] ?? '';
-        $uploaded_image = media_handle_upload('image', 0);
-        if (!is_wp_error($uploaded_image)) {
-            $image_url = wp_get_attachment_url($uploaded_image);
-
-            if (!empty($old_image_url)) {
-                $old_attachment_id = attachment_url_to_postid($old_image_url);
-                if ($old_attachment_id) {
-                    wp_delete_attachment($old_attachment_id, true);
-                }
-            }
-        } else {
-            $errors[] = 'Image upload failed.';
-            $image_url = $candidate['image'] ?? ''; // fallback to existing image on error
-        }
-    } else {
-        $image_url = $candidate['image'] ?? ''; // no upload, no deletion — keep old image
-    }
+    // 3. Handle avatar selection
+    $selected_avatar = sanitize_text_field($_POST['selected_avatar'] ?? '');
+    $valid_avatars = [
+        'user-man-1.png',
+        'user-man-2.png',
+        'user-man-3.png',
+        'user-woman-1.png',
+        'user-woman-2.png',
+        'user-woman-3.png',
+    ];
+    $image_url = in_array($selected_avatar, $valid_avatars)
+        ? get_template_directory_uri() . '/assets/media/' . $selected_avatar
+        : get_template_directory_uri() . '/assets/media/' . $default_avatar;
 
     // 4. Handle CV upload
-    $cv_id = 0;
-    if (!empty($_FILES['cv']['name'])) {
-        require_once ABSPATH . 'wp-admin/includes/file.php';
-        require_once ABSPATH . 'wp-admin/includes/media.php';
-        require_once ABSPATH . 'wp-admin/includes/image.php';
+    // $cv_id = 0;
+    // if (!empty($_FILES['cv']['name'])) {
+    //     require_once ABSPATH . 'wp-admin/includes/file.php';
+    //     require_once ABSPATH . 'wp-admin/includes/media.php';
+    //     require_once ABSPATH . 'wp-admin/includes/image.php';
 
-        $uploaded_cv = media_handle_upload('cv', 0);
+    //     $uploaded_cv = media_handle_upload('cv', 0);
 
-        if (!is_wp_error($uploaded_cv)) {
-            // ✅ Delete old CV if it exists
-            if (!empty($candidate['cv'])) {
-                $old_cv_id = attachment_url_to_postid($candidate['cv']);
-                if ($old_cv_id) {
-                    wp_delete_attachment($old_cv_id, true);
-                }
-            }
+    //     if (!is_wp_error($uploaded_cv)) {
+    //         if (!empty($candidate['cv'])) {
+    //             $old_cv_id = attachment_url_to_postid($candidate['cv']);
+    //             if ($old_cv_id) {
+    //                 wp_delete_attachment($old_cv_id, true);
+    //             }
+    //         }
 
-            $cv_id = $uploaded_cv;
-        } else {
-            $errors[] = 'CV upload failed.';
-        }
-    }
+    //         $cv_id = $uploaded_cv;
+    //     } else {
+    //         $errors[] = 'CV upload failed.';
+    //     }
+    // }
 
     // 5. Update DB
     if (empty($errors)) {
@@ -228,23 +208,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                             </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="">Image</label>
-                            <div class="update-image">
-                                <img src="<?php echo $image_url; ?>" alt="Profile Image" class="image">
-                                <input type="file" name="image" id="image" accept="image/jpeg, image/png">
-                                <input type="hidden" name="delete_image" id="deleteImage" value="0">
-                                <div class="buttons">
-                                    <label for="image" class="button edit">
-                                        <ion-icon name="create-outline"></ion-icon>
-                                    </label>
-                                    <a href="javascript:void()" class="button delete">
-                                        <ion-icon name="trash-outline"></ion-icon>
-                                    </a>
+                        <div class="row avatar-container">
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="">Image</label>
+                                    <div class="update-avatar">
+                                        <img src="<?php echo $image_url; ?>" alt="Profile Image" class="image">
+                                    </div>
                                 </div>
                             </div>
-                            <p class="image-file-name" style="display: none;"></p>
-                            <small class="file-hint">Max 5MB. JPG or PNG only.</small>
+                            <div class="col">
+                                <div class="form-group">
+                                    <label for="">Select an avatar:</label>
+                                    <div class="avatar-selection">
+                                        <?php
+                                        $avatars = [
+                                            'user-man-1.png',
+                                            'user-man-2.png',
+                                            'user-man-3.png',
+                                            'user-woman-1.png',
+                                            'user-woman-2.png',
+                                            'user-woman-3.png',
+                                        ];
+
+                                        foreach ($avatars as $avatar) {
+                                            $avatar_url = get_template_directory_uri() . '/assets/media/' . $avatar;
+                                            $checked = (basename($candidate['image']) === $avatar) ? 'checked' : '';
+                                            echo '
+                                            <label class="avatar-option">
+                                                <input type="radio" name="selected_avatar" value="' . esc_attr($avatar) . '" ' . $checked . '>
+                                                <img src="' . esc_url($avatar_url) . '" alt="' . esc_attr($avatar) . '" class="avatar-thumb">
+                                            </label>';
+                                        }
+                                    ?>
+                                    </div>
+                                    <small class="file-hint">Choose one avatar as your profile image.</small>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="row">
@@ -330,10 +330,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="phone">Phone</label>
+                                    <label for="phone">Phone <span class="required">*</span></label>
                                     <input type="text" name="phone" id="phone"
                                         value="<?php echo esc_attr($candidate['phone'] ?? ''); ?>"
-                                        placeholder="Enter phone number">
+                                        placeholder="Enter phone number" required>
                                 </div>
                             </div>
                         </div>
@@ -524,8 +524,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                 </option>
                                 <option value="Logistics" <?php selected($selected_sector, 'Logistics' ); ?>>Logistics
                                 </option>
-                                <option value="Technology & IT"
-                                    <?php selected($selected_sector, 'Technology & IT' ); ?>>
+                                <option value="Technology & IT" <?php selected($selected_sector, 'Technology & IT' ); ?>
+                                    >
                                     Technology & IT</option>
                                 <option value="Energy" <?php selected($selected_sector, 'Energy' ); ?>>Energy</option>
                                 <option value="Education" <?php selected($selected_sector, 'Education' ); ?>>Education
@@ -617,197 +617,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-hide PHP-rendered success message and clear ?updated=1 from URL
-    const autoHideMessage = document.querySelector('.form-message.success');
-    if (autoHideMessage && autoHideMessage.textContent.trim() !== '') {
-        setTimeout(() => {
-            autoHideMessage.style.display = 'none';
-            autoHideMessage.textContent = '';
+    document.addEventListener('DOMContentLoaded', function () {
+        // Auto-hide PHP-rendered success message and clear ?updated=1 from URL
+        const autoHideMessage = document.querySelector('.form-message.success');
+        if (autoHideMessage && autoHideMessage.textContent.trim() !== '') {
+            setTimeout(() => {
+                autoHideMessage.style.display = 'none';
+                autoHideMessage.textContent = '';
 
-            const url = new URL(window.location.href);
-            url.searchParams.delete('updated');
-            window.history.replaceState({}, document.title, url.pathname + url.search);
-        }, 5000);
-    }
+                const url = new URL(window.location.href);
+                url.searchParams.delete('updated');
+                window.history.replaceState({}, document.title, url.pathname + url.search);
+            }, 5000);
+        }
 
-    const imageInput = document.getElementById('image');
-    const imageFileNameDisplay = document.querySelector('.image-file-name');
-    const previewImage = document.querySelector('.update-image img');
+        const messageBox = document.querySelector('.form-message');
 
-    const messageBox = document.querySelector('.form-message');
+        function showMessage(msg, type = 'success') {
+            messageBox.textContent = msg;
+            messageBox.className = `form-message ${type}`;
+            messageBox.style.display = 'block';
+            messageBox.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
 
-    function showMessage(msg, type = 'success') {
-        messageBox.textContent = msg;
-        messageBox.className = `form-message ${type}`;
-        messageBox.style.display = 'block';
-        messageBox.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center'
+            setTimeout(() => {
+                messageBox.textContent = '';
+                messageBox.style.display = 'none';
+            }, 5000);
+        }
+
+        // Update profile preview when an avatar is selected
+        document.querySelectorAll('input[name="selected_avatar"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const previewImg = document.querySelector('.update-avatar img');
+                if (previewImg) {
+                    previewImg.src = this.nextElementSibling.src;
+                }
+            });
         });
 
-        setTimeout(() => {
-            messageBox.textContent = '';
-            messageBox.style.display = 'none';
-        }, 5000);
-    }
+        // CV input handler — check if element exists first
+        // const cvInput = document.getElementById('cv');
+        // const cvFileNameDisplay = document.querySelector('.cv-file-name');
 
-    // Image input handler
-    if (imageInput) {
-        imageInput.addEventListener('change', function() {
-            const file = imageInput.files[0];
-            if (!file) return;
+        // if (cvInput && cvFileNameDisplay) {
+        //     cvInput.addEventListener('change', function() {
+        //         const file = cvInput.files[0];
+        //         if (!file) return;
 
-            const allowedTypes = ['image/jpeg', 'image/png'];
-            const maxSize = 5 * 1024 * 1024; // 5MB
+        //         const allowedType = 'application/pdf';
+        //         const maxSize = 2 * 1024 * 1024; // 2MB
 
-            if (!allowedTypes.includes(file.type)) {
-                showMessage('Only JPG or PNG images are allowed.', 'error');
-                imageInput.value = '';
-                imageFileNameDisplay.textContent = '';
-                imageFileNameDisplay.style.display = 'none';
-                previewImage.src = '<?php echo get_template_directory_uri(); ?>/assets/media/user.png';
-                return;
-            }
+        //         if (file.type !== allowedType) {
+        //             showMessage('Only PDF files are allowed for CV.', 'error');
+        //             cvInput.value = '';
+        //             cvFileNameDisplay.textContent = '';
+        //             cvFileNameDisplay.style.display = 'none';
+        //             return;
+        //         }
 
-            if (file.size > maxSize) {
-                showMessage('Image must be smaller than 5MB.', 'error');
-                imageInput.value = '';
-                imageFileNameDisplay.textContent = '';
-                imageFileNameDisplay.style.display = 'none';
-                previewImage.src = '<?php echo get_template_directory_uri(); ?>/assets/media/user.png';
-                return;
-            }
+        //         if (file.size > maxSize) {
+        //             showMessage('CV must be smaller than 2MB.', 'error');
+        //             cvInput.value = '';
+        //             cvFileNameDisplay.textContent = '';
+        //             cvFileNameDisplay.style.display = 'none';
+        //             return;
+        //         }
 
-            imageFileNameDisplay.textContent = file.name;
-            imageFileNameDisplay.style.display = 'block';
+        //         cvFileNameDisplay.textContent = file.name;
+        //         cvFileNameDisplay.style.display = 'block';
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImage.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        //         showMessage('CV selected successfully.', 'success');
+        //     });
+        // }
 
-            showMessage('Image selected successfully.', 'success');
-        });
-    }
+        // Sub-role population
+        const subrolesMap = {
+            "Data Analyst": [
+                "Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
+                "Financial Data Analyst", "Operations Analyst", "Supply Chain Analyst",
+                "Statistical Analyst"
+            ],
+            "Business Analyst": [
+                "Process Analyst", "Change Analyst", "Functional Business Analyst",
+                "Business Process Analyst"
+            ],
+            "BI Specialist": [
+                "BI Analyst", "BI Developer", "Power BI Specialist", "Tableau Specialist",
+                "Dashboard Specialist", "Data Visualization Specialist"
+            ],
+            "Data Scientist": [
+                "Predictive Analytics Specialist", "Machine Learning Engineer", "AI Engineer",
+                "NLP Specialist", "Quantitative Analyst"
+            ],
+            "Data Engineer": [
+                "ETL Developer", "Analytics Engineer", "Data Platform Engineer",
+                "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
+            ],
+            "Information Analyst": [
+                "Functional Analyst", "Technical Analyst", "Systems Analyst",
+                "Application Analyst", "Requirements Analyst"
+            ]
+        };
 
-    // Delete image
-    const deleteImageBtn = document.querySelector('.update-image .delete');
-    const deleteImageInput = document.getElementById('deleteImage');
+        const specializationSelect = document.getElementById('specialization');
+        const subRoleSelect = document.getElementById('subRole');
 
-    if (deleteImageBtn && deleteImageInput && previewImage && imageInput && imageFileNameDisplay) {
-        deleteImageBtn.addEventListener('click', function(e) {
-            e.preventDefault();
+        const selectedSpecialization = "<?php echo esc_js($selected_specialization); ?>";
+        const selectedSubRole = "<?php echo esc_js($selected_sub_role); ?>";
 
-            const confirmDelete = confirm('Are you sure you want to delete the profile image?');
-            if (!confirmDelete) return;
+        function populateSubRoles(specialization, selected) {
+            const roles = subrolesMap[specialization] || [];
+            subRoleSelect.innerHTML = '<option value="" disabled>Select sub role</option>';
 
-            previewImage.src = '<?php echo get_template_directory_uri(); ?>/assets/media/user.png';
-            imageInput.value = '';
-            imageFileNameDisplay.textContent = '';
-            imageFileNameDisplay.style.display = 'none';
-            deleteImageInput.value = '1';
+            roles.forEach(function (role) {
+                const opt = document.createElement('option');
+                opt.value = role;
+                opt.textContent = role;
+                if (role === selected) {
+                    opt.selected = true;
+                }
+                subRoleSelect.appendChild(opt);
+            });
+        }
 
-            showMessage('Image marked for deletion. Click "Update" to confirm.', 'success');
-        });
-    }
+        if (selectedSpecialization) {
+            populateSubRoles(selectedSpecialization, selectedSubRole);
+        }
 
-    // CV input handler — check if element exists first
-    const cvInput = document.getElementById('cv');
-    const cvFileNameDisplay = document.querySelector('.cv-file-name');
-
-    if (cvInput && cvFileNameDisplay) {
-        cvInput.addEventListener('change', function() {
-            const file = cvInput.files[0];
-            if (!file) return;
-
-            const allowedType = 'application/pdf';
-            const maxSize = 2 * 1024 * 1024; // 2MB
-
-            if (file.type !== allowedType) {
-                showMessage('Only PDF files are allowed for CV.', 'error');
-                cvInput.value = '';
-                cvFileNameDisplay.textContent = '';
-                cvFileNameDisplay.style.display = 'none';
-                return;
-            }
-
-            if (file.size > maxSize) {
-                showMessage('CV must be smaller than 2MB.', 'error');
-                cvInput.value = '';
-                cvFileNameDisplay.textContent = '';
-                cvFileNameDisplay.style.display = 'none';
-                return;
-            }
-
-            cvFileNameDisplay.textContent = file.name;
-            cvFileNameDisplay.style.display = 'block';
-
-            showMessage('CV selected successfully.', 'success');
-        });
-    }
-
-    // Sub-role population
-    const subrolesMap = {
-        "Data Analyst": [
-            "Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
-            "Financial Data Analyst", "Operations Analyst", "Supply Chain Analyst",
-            "Statistical Analyst"
-        ],
-        "Business Analyst": [
-            "Process Analyst", "Change Analyst", "Functional Business Analyst",
-            "Business Process Analyst"
-        ],
-        "BI Specialist": [
-            "BI Analyst", "BI Developer", "Power BI Specialist", "Tableau Specialist",
-            "Dashboard Specialist", "Data Visualization Specialist"
-        ],
-        "Data Scientist": [
-            "Predictive Analytics Specialist", "Machine Learning Engineer", "AI Engineer",
-            "NLP Specialist", "Quantitative Analyst"
-        ],
-        "Data Engineer": [
-            "ETL Developer", "Analytics Engineer", "Data Platform Engineer",
-            "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
-        ],
-        "Information Analyst": [
-            "Functional Analyst", "Technical Analyst", "Systems Analyst",
-            "Application Analyst", "Requirements Analyst"
-        ]
-    };
-
-    const specializationSelect = document.getElementById('specialization');
-    const subRoleSelect = document.getElementById('subRole');
-
-    const selectedSpecialization = "<?php echo esc_js($selected_specialization); ?>";
-    const selectedSubRole = "<?php echo esc_js($selected_sub_role); ?>";
-
-    function populateSubRoles(specialization, selected) {
-        const roles = subrolesMap[specialization] || [];
-        subRoleSelect.innerHTML = '<option value="" disabled>Select sub role</option>';
-
-        roles.forEach(function(role) {
-            const opt = document.createElement('option');
-            opt.value = role;
-            opt.textContent = role;
-            if (role === selected) {
-                opt.selected = true;
-            }
-            subRoleSelect.appendChild(opt);
-        });
-    }
-
-    if (selectedSpecialization) {
-        populateSubRoles(selectedSpecialization, selectedSubRole);
-    }
-
-    if (specializationSelect) {
-        specializationSelect.addEventListener('change', function() {
-            populateSubRoles(this.value, '');
-        });
-    }
-});
+        if (specializationSelect) {
+            specializationSelect.addEventListener('change', function () {
+                populateSubRoles(this.value, '');
+            });
+        }
+    });
 </script>
 
 <?php get_footer(); ?>
