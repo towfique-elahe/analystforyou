@@ -197,6 +197,53 @@ $theme_url = get_template_directory_uri();
 ?>
 
 <script>
+// Blur-based inline validation
+document.querySelectorAll('input, textarea, select').forEach(field => {
+    field.addEventListener('blur', () => {
+        if (field.hasAttribute('required') && !field.value.trim()) {
+            showError(field, 'This field is required');
+        } else if (field.type === 'email' && !validateEmail(field.value.trim())) {
+            showError(field, 'Invalid email format');
+        } else if (field.type === 'tel' && field.value.trim() && !validatePhone(field.value.trim())) {
+            showError(field, 'Invalid phone number');
+        } else {
+            clearError(field);
+        }
+    });
+});
+
+// Email validation
+function validateEmail(email) {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+}
+
+// Phone validation
+function validatePhone(phone) {
+    // Basic international number validation
+    const regex = /^\+?[0-9\s\-()]{7,20}$/;
+    return phone === '' || regex.test(phone);
+}
+
+// Show error message
+function showError(input, message) {
+    let error = input.parentElement.querySelector('.error-message');
+    if (!error) {
+        error = document.createElement('div');
+        error.className = 'error-message';
+        input.parentElement.appendChild(error);
+    }
+    error.textContent = message;
+    input.classList.add('input-error');
+}
+
+// Clear error message
+function clearError(input) {
+    let error = input.parentElement.querySelector('.error-message');
+    if (error) error.textContent = '';
+    input.classList.remove('input-error');
+}
+
 // Generate consistent background color from a string
 function stringToColor(str) {
     let hash = 0;
@@ -467,6 +514,35 @@ document.addEventListener("DOMContentLoaded", function() {
         findButton.addEventListener("click", function() {
             const nameInput = document.getElementById("recruiter-name");
             const emailInput = document.getElementById("recruiter-email");
+            const phoneInput = document.getElementById("recruiter-phone");
+
+            let valid = true;
+
+            if (!nameInput.value.trim()) {
+                showError(nameInput, "Name is required");
+                valid = false;
+            } else {
+                clearError(nameInput);
+            }
+
+            if (!emailInput.value.trim()) {
+                showError(emailInput, "Email is required");
+                valid = false;
+            } else if (!validateEmail(emailInput.value.trim())) {
+                showError(emailInput, "Invalid email format");
+                valid = false;
+            } else {
+                clearError(emailInput);
+            }
+
+            if (phoneInput.value && !validatePhone(phoneInput.value.trim())) {
+                showError(phoneInput, "Invalid phone number");
+                valid = false;
+            } else {
+                clearError(phoneInput);
+            }
+
+            if (!valid) return;
 
             const name = nameInput.value.trim();
             const email = emailInput.value.trim();
@@ -595,31 +671,94 @@ document.addEventListener("DOMContentLoaded", function() {
     document.querySelector('.contact-form').addEventListener('submit', function(event) {
         event.preventDefault();
 
-        // Gather form data
-        const formData = {
-            name: document.getElementById("contact-recruiter-name").value.trim(),
-            company: document.getElementById("contact-company-name").value.trim(),
-            email: document.getElementById("contact-email").value.trim(),
-            phone: document.getElementById("contact-phone").value.trim(),
-            role: document.getElementById("contact-role").value.trim(),
-            message: document.getElementById("contact-message").value.trim(),
-            urgency: document.getElementById("contact-urgency").value,
-            method: document.getElementById("contact-method").value,
-            candidate: selections.contactCandidateDetails,
-        };
+        const form = event.target;
+        const name = form["contact-recruiter-name"];
+        const company = form["contact-company-name"];
+        const email = form["contact-email"];
+        const phone = form["contact-phone"];
+        const message = form["contact-message"];
+        const urgency = form["contact-urgency"];
+        const method = form["contact-method"];
+        const consent = document.getElementById("contact-consent");
 
-        // Simple validation (HTML required attributes already help)
-        if (!formData.name || !formData.company || !formData.email || !formData.message || !formData
-            .urgency || !formData.method) {
-            alert("Please fill in all required fields.");
-            return;
+        let valid = true;
+
+        if (!name.value.trim()) {
+            showError(name, "Name is required");
+            valid = false;
+        } else {
+            clearError(name);
         }
 
-        // Show loading message immediately
+        if (!company.value.trim()) {
+            showError(company, "Company name is required");
+            valid = false;
+        } else {
+            clearError(company);
+        }
+
+        if (!email.value.trim()) {
+            showError(email, "Email is required");
+            valid = false;
+        } else if (!validateEmail(email.value.trim())) {
+            showError(email, "Invalid email format");
+            valid = false;
+        } else {
+            clearError(email);
+        }
+
+        if (phone.value && !validatePhone(phone.value.trim())) {
+            showError(phone, "Invalid phone number");
+            valid = false;
+        } else {
+            clearError(phone);
+        }
+
+        if (!message.value.trim()) {
+            showError(message, "Message is required");
+            valid = false;
+        } else {
+            clearError(message);
+        }
+
+        if (!urgency.value) {
+            showError(urgency, "Select urgency");
+            valid = false;
+        } else {
+            clearError(urgency);
+        }
+
+        if (!method.value) {
+            showError(method, "Select contact method");
+            valid = false;
+        } else {
+            clearError(method);
+        }
+
+        if (!consent.checked) {
+            alert("You must agree to be contacted.");
+            valid = false;
+        }
+
+        if (!valid) return;
+
+        // Show loader and send AJAX request
         document.querySelector('.loader-message').style.display = 'block';
         document.querySelector('.contact-form').style.display = 'none';
 
-        // Send to server via AJAX
+        // Build formData
+        const formData = {
+            name: name.value.trim(),
+            company: company.value.trim(),
+            email: email.value.trim(),
+            phone: phone.value.trim(),
+            role: document.getElementById("contact-role").value.trim(),
+            message: message.value.trim(),
+            urgency: urgency.value,
+            method: method.value,
+            candidate: selections.contactCandidateDetails,
+        };
+
         fetch(ajaxUrl, {
                 method: "POST",
                 headers: {
@@ -637,8 +776,6 @@ document.addEventListener("DOMContentLoaded", function() {
                     document.querySelector('.confirmation-message').style.display = 'block';
                 } else {
                     alert("Failed to send message. Please try again later.");
-                    console.error(response);
-                    // Hide loader and show the form again in case of failure
                     document.querySelector('.loader-message').style.display = 'none';
                     document.querySelector('.contact-form').style.display = 'block';
                 }
@@ -649,7 +786,6 @@ document.addEventListener("DOMContentLoaded", function() {
                 document.querySelector('.loader-message').style.display = 'none';
                 document.querySelector('.contact-form').style.display = 'block';
             });
-
     });
 
     // Handle Back button in contact form

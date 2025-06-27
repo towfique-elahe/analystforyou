@@ -30,15 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_login'])) {
 
     $user = wp_signon($creds, false);
 
+    $login_error = '';
     if (is_wp_error($user)) {
-        echo '<p style="color:crimson;">Login failed: ' . esc_html($user->get_error_message()) . '</p>';
+        $login_error = '<p class="error" style="color:crimson;">Login failed: ' . $user->get_error_message() . '</p>';
     } else {
         if (in_array('candidate', (array) $user->roles)) {
             wp_redirect(site_url('/candidate-dashboard'));
             exit;
         } else {
             wp_logout();
-            echo '<p style="color:crimson;">Access denied. Only candidates can log in here.</p>';
+            $login_error = '<p class="error" style="color:crimson;">Access denied. Only candidates can log in here.</p>';
         }
     }
 }
@@ -55,6 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_login'])) {
             <form method="post" class="auth-form" autocomplete="off">
                 <h3 class="heading">Welcome Back</h3>
                 <p class="sub-heading">Login to access your candidate dashboard</p>
+                <?php if (!empty($login_error)) {
+                    echo $login_error;
+                } ?>
                 <div class="form-group">
                     <label for="username">Email or Username <span class="required">*</span></label>
                     <input type="text" name="username" id="username" placeholder="Enter your email or username"

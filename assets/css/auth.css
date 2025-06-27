@@ -33,19 +33,21 @@
   flex-direction: column;
   gap: 15px;
 }
-#auth .error-message {
-  display: none;
-}
 #auth .error {
   font-family: var(--text-font-family);
   font-weight: 500;
   font-size: 14px;
+  text-align: center;
   color: crimson;
+}
+#auth .error strong {
+  text-decoration: underline;
 }
 #auth .success {
   font-family: var(--text-font-family);
   font-weight: 500;
   font-size: 14px;
+  text-align: center;
   color: green;
 }
 #auth .auth-form .heading {

@@ -29,8 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_register'])
     $confirm_password = $_POST['confirm_password'];
     $username = sanitize_user($_POST['username']);
 
+    $register_error = '';
     if ($password !== $confirm_password) {
-        echo '<div class="error">Passwords do not match.</div>';
+        $register_error = '<div class="error">Passwords do not match.</div>';
     } else {
         if (empty($username)) {
             $base_username = sanitize_title($first_name . '_' . $last_name);
@@ -73,10 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_register'])
                     exit;
                 }
             } else {
-                echo '<div class="error">' . $user_id->get_error_message() . '</div>';
+                $register_error = '<div class="error">' . $user_id->get_error_message() . '</div>';
             }
         } else {
-            echo '<div class="error">Username or email already exists.</div>';
+            $register_error = '<div class="error">Username or email already exists.</div>';
         }
     }
 }
@@ -94,6 +95,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_register'])
             <form method="post" class="auth-form" autocomplete="off">
                 <h3 class="heading">Create Your Candidate Profile</h3>
                 <p class="sub-heading">It only takes a minute to register. Start your journey with us!</p>
+                <?php if (!empty($register_error)) {
+                    echo $register_error;
+                } ?>
                 <div class="form-group">
                     <label for="first_name">First Name <span class="required">*</span></label>
                     <input type="text" name="first_name" id="first_name" placeholder="John" required>

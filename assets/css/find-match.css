@@ -109,6 +109,15 @@
   flex-direction: column;
   gap: 15px;
 }
+#findMatch .form .input-error {
+  border-color: crimson !important;
+}
+#findMatch .form .error-message {
+  color: crimson;
+  font-family: var(--text-font-family);
+  font-weight: 500;
+  font-size: 14px;
+}
 #findMatch .form-group {
   display: flex;
   flex-direction: column;
