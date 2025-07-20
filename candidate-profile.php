@@ -99,6 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
 
     // 3. Handle avatar selection
     $selected_avatar = sanitize_text_field($_POST['selected_avatar'] ?? '');
+    if (empty($selected_avatar)) {
+        $errors[] = 'Please select an avatar.';
+    }
     $valid_avatars = [
         'user-man-1.png',
         'user-man-2.png',
@@ -170,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
             exit;
         } else {
             $form_message = 'No changes made.';
-            $form_message_type = 'success';
+            $form_message_type = 'error';
         }
     } else {
         $form_message = implode('<br>', $errors);
@@ -219,7 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Select an avatar:</label>
+                                    <label for="">Select an avatar <span class="required">*</span></label>
                                     <div class="avatar-selection">
                                         <?php
                                         $avatars = [
@@ -524,8 +527,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                 </option>
                                 <option value="Logistics" <?php selected($selected_sector, 'Logistics' ); ?>>Logistics
                                 </option>
-                                <option value="Technology & IT" <?php selected($selected_sector, 'Technology & IT' ); ?>
-                                    >
+                                <option value="Technology & IT"
+                                    <?php selected($selected_sector, 'Technology & IT' ); ?>>
                                     Technology & IT</option>
                                 <option value="Energy" <?php selected($selected_sector, 'Energy' ); ?>>Energy</option>
                                 <option value="Education" <?php selected($selected_sector, 'Education' ); ?>>Education
@@ -617,142 +620,142 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Auto-hide PHP-rendered success message and clear ?updated=1 from URL
-        const autoHideMessage = document.querySelector('.form-message.success');
-        if (autoHideMessage && autoHideMessage.textContent.trim() !== '') {
-            setTimeout(() => {
-                autoHideMessage.style.display = 'none';
-                autoHideMessage.textContent = '';
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide PHP-rendered success message and clear ?updated=1 from URL
+    const autoHideMessage = document.querySelector('.form-message.success');
+    if (autoHideMessage && autoHideMessage.textContent.trim() !== '') {
+        setTimeout(() => {
+            autoHideMessage.style.display = 'none';
+            autoHideMessage.textContent = '';
 
-                const url = new URL(window.location.href);
-                url.searchParams.delete('updated');
-                window.history.replaceState({}, document.title, url.pathname + url.search);
-            }, 5000);
-        }
+            const url = new URL(window.location.href);
+            url.searchParams.delete('updated');
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+        }, 5000);
+    }
 
-        const messageBox = document.querySelector('.form-message');
+    const messageBox = document.querySelector('.form-message');
 
-        function showMessage(msg, type = 'success') {
-            messageBox.textContent = msg;
-            messageBox.className = `form-message ${type}`;
-            messageBox.style.display = 'block';
-            messageBox.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-
-            setTimeout(() => {
-                messageBox.textContent = '';
-                messageBox.style.display = 'none';
-            }, 5000);
-        }
-
-        // Update profile preview when an avatar is selected
-        document.querySelectorAll('input[name="selected_avatar"]').forEach(radio => {
-            radio.addEventListener('change', function () {
-                const previewImg = document.querySelector('.update-avatar img');
-                if (previewImg) {
-                    previewImg.src = this.nextElementSibling.src;
-                }
-            });
+    function showMessage(msg, type = 'success') {
+        messageBox.textContent = msg;
+        messageBox.className = `form-message ${type}`;
+        messageBox.style.display = 'block';
+        messageBox.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
         });
 
-        // CV input handler — check if element exists first
-        // const cvInput = document.getElementById('cv');
-        // const cvFileNameDisplay = document.querySelector('.cv-file-name');
+        setTimeout(() => {
+            messageBox.textContent = '';
+            messageBox.style.display = 'none';
+        }, 5000);
+    }
 
-        // if (cvInput && cvFileNameDisplay) {
-        //     cvInput.addEventListener('change', function() {
-        //         const file = cvInput.files[0];
-        //         if (!file) return;
-
-        //         const allowedType = 'application/pdf';
-        //         const maxSize = 2 * 1024 * 1024; // 2MB
-
-        //         if (file.type !== allowedType) {
-        //             showMessage('Only PDF files are allowed for CV.', 'error');
-        //             cvInput.value = '';
-        //             cvFileNameDisplay.textContent = '';
-        //             cvFileNameDisplay.style.display = 'none';
-        //             return;
-        //         }
-
-        //         if (file.size > maxSize) {
-        //             showMessage('CV must be smaller than 2MB.', 'error');
-        //             cvInput.value = '';
-        //             cvFileNameDisplay.textContent = '';
-        //             cvFileNameDisplay.style.display = 'none';
-        //             return;
-        //         }
-
-        //         cvFileNameDisplay.textContent = file.name;
-        //         cvFileNameDisplay.style.display = 'block';
-
-        //         showMessage('CV selected successfully.', 'success');
-        //     });
-        // }
-
-        // Sub-role population
-        const subrolesMap = {
-            "Data Analyst": [
-                "Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
-                "Financial Data Analyst", "Operations Analyst", "Supply Chain Analyst",
-                "Statistical Analyst"
-            ],
-            "Business Analyst": [
-                "Process Analyst", "Change Analyst", "Functional Business Analyst",
-                "Business Process Analyst"
-            ],
-            "BI Specialist": [
-                "BI Analyst", "BI Developer", "Power BI Specialist", "Tableau Specialist",
-                "Dashboard Specialist", "Data Visualization Specialist"
-            ],
-            "Data Scientist": [
-                "Predictive Analytics Specialist", "Machine Learning Engineer", "AI Engineer",
-                "NLP Specialist", "Quantitative Analyst"
-            ],
-            "Data Engineer": [
-                "ETL Developer", "Analytics Engineer", "Data Platform Engineer",
-                "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
-            ],
-            "Information Analyst": [
-                "Functional Analyst", "Technical Analyst", "Systems Analyst",
-                "Application Analyst", "Requirements Analyst"
-            ]
-        };
-
-        const specializationSelect = document.getElementById('specialization');
-        const subRoleSelect = document.getElementById('subRole');
-
-        const selectedSpecialization = "<?php echo esc_js($selected_specialization); ?>";
-        const selectedSubRole = "<?php echo esc_js($selected_sub_role); ?>";
-
-        function populateSubRoles(specialization, selected) {
-            const roles = subrolesMap[specialization] || [];
-            subRoleSelect.innerHTML = '<option value="" disabled>Select sub role</option>';
-
-            roles.forEach(function (role) {
-                const opt = document.createElement('option');
-                opt.value = role;
-                opt.textContent = role;
-                if (role === selected) {
-                    opt.selected = true;
-                }
-                subRoleSelect.appendChild(opt);
-            });
-        }
-
-        if (selectedSpecialization) {
-            populateSubRoles(selectedSpecialization, selectedSubRole);
-        }
-
-        if (specializationSelect) {
-            specializationSelect.addEventListener('change', function () {
-                populateSubRoles(this.value, '');
-            });
-        }
+    // Update profile preview when an avatar is selected
+    document.querySelectorAll('input[name="selected_avatar"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const previewImg = document.querySelector('.update-avatar img');
+            if (previewImg) {
+                previewImg.src = this.nextElementSibling.src;
+            }
+        });
     });
+
+    // CV input handler — check if element exists first
+    // const cvInput = document.getElementById('cv');
+    // const cvFileNameDisplay = document.querySelector('.cv-file-name');
+
+    // if (cvInput && cvFileNameDisplay) {
+    //     cvInput.addEventListener('change', function() {
+    //         const file = cvInput.files[0];
+    //         if (!file) return;
+
+    //         const allowedType = 'application/pdf';
+    //         const maxSize = 2 * 1024 * 1024; // 2MB
+
+    //         if (file.type !== allowedType) {
+    //             showMessage('Only PDF files are allowed for CV.', 'error');
+    //             cvInput.value = '';
+    //             cvFileNameDisplay.textContent = '';
+    //             cvFileNameDisplay.style.display = 'none';
+    //             return;
+    //         }
+
+    //         if (file.size > maxSize) {
+    //             showMessage('CV must be smaller than 2MB.', 'error');
+    //             cvInput.value = '';
+    //             cvFileNameDisplay.textContent = '';
+    //             cvFileNameDisplay.style.display = 'none';
+    //             return;
+    //         }
+
+    //         cvFileNameDisplay.textContent = file.name;
+    //         cvFileNameDisplay.style.display = 'block';
+
+    //         showMessage('CV selected successfully.', 'success');
+    //     });
+    // }
+
+    // Sub-role population
+    const subrolesMap = {
+        "Data Analyst": [
+            "Reporting Analyst", "Marketing Data Analyst", "Customer Insights Analyst",
+            "Financial Data Analyst", "Operations Analyst", "Supply Chain Analyst",
+            "Statistical Analyst"
+        ],
+        "Business Analyst": [
+            "Process Analyst", "Change Analyst", "Functional Business Analyst",
+            "Business Process Analyst"
+        ],
+        "BI Specialist": [
+            "BI Analyst", "BI Developer", "Power BI Specialist", "Tableau Specialist",
+            "Dashboard Specialist", "Data Visualization Specialist"
+        ],
+        "Data Scientist": [
+            "Predictive Analytics Specialist", "Machine Learning Engineer", "AI Engineer",
+            "NLP Specialist", "Quantitative Analyst"
+        ],
+        "Data Engineer": [
+            "ETL Developer", "Analytics Engineer", "Data Platform Engineer",
+            "Data Integration Specialist", "Data Architect", "Data Quality Analyst", "Data Steward"
+        ],
+        "Information Analyst": [
+            "Functional Analyst", "Technical Analyst", "Systems Analyst",
+            "Application Analyst", "Requirements Analyst"
+        ]
+    };
+
+    const specializationSelect = document.getElementById('specialization');
+    const subRoleSelect = document.getElementById('subRole');
+
+    const selectedSpecialization = "<?php echo esc_js($selected_specialization); ?>";
+    const selectedSubRole = "<?php echo esc_js($selected_sub_role); ?>";
+
+    function populateSubRoles(specialization, selected) {
+        const roles = subrolesMap[specialization] || [];
+        subRoleSelect.innerHTML = '<option value="" disabled>Select sub role</option>';
+
+        roles.forEach(function(role) {
+            const opt = document.createElement('option');
+            opt.value = role;
+            opt.textContent = role;
+            if (role === selected) {
+                opt.selected = true;
+            }
+            subRoleSelect.appendChild(opt);
+        });
+    }
+
+    if (selectedSpecialization) {
+        populateSubRoles(selectedSpecialization, selectedSubRole);
+    }
+
+    if (specializationSelect) {
+        specializationSelect.addEventListener('change', function() {
+            populateSubRoles(this.value, '');
+        });
+    }
+});
 </script>
 
 <?php get_footer(); ?>

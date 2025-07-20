@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_register'])
                 $table = $wpdb->prefix . 'candidates';
                 $wpdb->insert($table, [
                     'id' => $user_id,
-                    'status' => 'In Review',
+                    'status' => 'Private',
                     'first_name' => $first_name,
                     'last_name' => $last_name,
                     'email' => $email,
