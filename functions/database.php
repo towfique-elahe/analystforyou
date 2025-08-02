@@ -6,7 +6,7 @@
 function create_custom_tables() {
     global $wpdb;
 
-    $custom_tables_version = '1.0.3';
+    $custom_tables_version = '1.0.6';
     $installed_version = get_option('custom_tables_version');
 
     if ($installed_version === $custom_tables_version) {
@@ -27,9 +27,9 @@ function create_custom_tables() {
         country VARCHAR(255) NULL,
         address TEXT NULL,
         city VARCHAR(255) NULL,
-        postal_code VARCHAR(50) NULL,
-        phone VARCHAR(20) NULL,
-        bio VARCHAR(255) NULL,
+        postal_code VARCHAR(255) NULL,
+        phone VARCHAR(255) NULL,
+        bio TEXT NULL,
         specialization VARCHAR(255) NULL,
         sub_role VARCHAR(255) NULL,
         lang_tools VARCHAR(255) NULL,
@@ -37,7 +37,7 @@ function create_custom_tables() {
         availability VARCHAR(255) NULL,
         sector VARCHAR(255) NULL,
         education VARCHAR(255) NULL,
-        languages VARCHAR(255) NULL,
+        languages TEXT NULL,
         cv VARCHAR(255) NULL,
         image VARCHAR(255) NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

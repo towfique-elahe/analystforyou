@@ -45,20 +45,11 @@ if (!empty($candidate['image'])) {
     if (filter_var($candidate['image'], FILTER_VALIDATE_URL)) {
         $image_url = esc_url($candidate['image']);
     } else {
-        $image_url = esc_url(site_url($candidate['image']));
+        $image_url = !empty($candidate['image']) ? esc_url(site_url($candidate['image'] ?? '')) : '';
     }
-    $image_file_name = basename($candidate['image']);
+    $image_file_name = !empty($candidate['image']) ? basename($candidate['image']) : '';
 } else {
     $image_file_name = $default_avatar;
-}
-
-// Load CV
-$cv_url = '';
-$cv_file_name = '';
-if (!empty($candidate['cv'])) {
-    $cv_raw = $candidate['cv'];
-    $cv_url = filter_var($cv_raw, FILTER_VALIDATE_URL) ? $cv_raw : site_url($cv_raw);
-    $cv_file_name = basename($cv_raw);
 }
 
 if (isset($_GET['updated']) && $_GET['updated'] === '1') {
@@ -70,114 +61,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
     $errors = [];
     $user_id = get_current_user_id();
 
-    // 1. Sanitize fields
-    $status = isset($_POST['status']) && $_POST['status'] === 'Public' ? 'Public' : 'Private';
-    $first_name = sanitize_text_field($_POST['first_name']);
-    $last_name = sanitize_text_field($_POST['last_name']);
-    $date_of_birth = sanitize_text_field($_POST['date_of_birth']);
-    $country = sanitize_text_field($_POST['country']);
-    $address = sanitize_text_field($_POST['address']);
-    $city = sanitize_text_field($_POST['city']);
-    $postal_code = sanitize_text_field($_POST['postal_code']);
-    $phone = sanitize_text_field($_POST['phone']);
-    $languages = !empty($_POST['languages']) ? implode(', ', array_map('sanitize_text_field', $_POST['languages'])) : '';
-    $education = sanitize_text_field($_POST['education']);
-    $bio = sanitize_textarea_field($_POST['bio']);
-    $specialization = sanitize_text_field($_POST['specialization']);
-    $sub_role = sanitize_text_field($_POST['sub_role']);
-    $experience = sanitize_text_field($_POST['experience']);
-    $availability = sanitize_text_field($_POST['availability']);
-    $sector = sanitize_text_field($_POST['sector']);
-    $lang_tools = !empty($_POST['lang_tools']) ? implode(', ', array_map('sanitize_text_field', $_POST['lang_tools'])) : '';
+    // Sanitize inputs
+    $status = ($_POST['status'] ?? '') === 'Public' ? 'Public' : 'Private';
+    $first_name = sanitize_text_field($_POST['first_name'] ?? '');
+    $last_name = sanitize_text_field($_POST['last_name'] ?? '');
+    $date_of_birth = sanitize_text_field($_POST['date_of_birth'] ?? '');
+    $country = sanitize_text_field($_POST['country'] ?? '');
+    $address = sanitize_text_field($_POST['address'] ?? '');
+    $city = sanitize_text_field($_POST['city'] ?? '');
+    $postal_code = sanitize_text_field($_POST['postal_code'] ?? '');
+    $phone = sanitize_text_field($_POST['phone'] ?? '');
+    $languages = $_POST['languages'] ?? [];
+    $education = sanitize_text_field($_POST['education'] ?? '');
+    $bio = sanitize_textarea_field($_POST['bio'] ?? '');
+    $specialization = sanitize_text_field($_POST['specialization'] ?? '');
+    $sub_role = sanitize_text_field($_POST['sub_role'] ?? '');
+    $experience = sanitize_text_field($_POST['experience'] ?? '');
+    $availability = sanitize_text_field($_POST['availability'] ?? '');
+    $sector = sanitize_text_field($_POST['sector'] ?? '');
+    $lang_tools = $_POST['lang_tools'] ?? [];
 
-    // 2. Update user meta
-    wp_update_user([
-        'ID' => $user_id,
-        'first_name' => $first_name,
-        'last_name' => $last_name,
-    ]);
+    // Validation rules
+    if (empty($first_name)) $errors['first_name'] = 'First name is required.';
+    if (empty($last_name)) $errors['last_name'] = 'Last name is required.';
+    if (empty($date_of_birth)) $errors['date_of_birth'] = 'Date of birth is required.';
+    if (empty($country)) $errors['country'] = 'Country is required.';
+    if (empty($phone)) $errors['phone'] = 'Phone number is required.';
+    if (empty($languages)) $errors['languages'] = 'At least one language must be selected.';
+    if (empty($education)) $errors['education'] = 'Education is required.';
+    if (empty($bio)) $errors['bio'] = 'Bio is required.';
+    elseif (strlen($bio) > 2000) $errors['bio'] = 'Bio is too long. Maximum 2000 characters.';
+    if (empty($specialization)) $errors['specialization'] = 'Specialization is required.';
+    if (empty($sub_role)) $errors['sub_role'] = 'Sub-role is required.';
+    if (empty($experience)) $errors['experience'] = 'Experience level is required.';
+    if (empty($availability)) $errors['availability'] = 'Availability is required.';
+    if (empty($sector)) $errors['sector'] = 'Sector is required.';
+    if (empty($lang_tools)) $errors['lang_tools'] = 'At least one tool or language must be selected.';
 
-    // 3. Handle avatar selection
-    $selected_avatar = sanitize_text_field($_POST['selected_avatar'] ?? '');
-    if (empty($selected_avatar)) {
-        $errors[] = 'Please select an avatar.';
-    }
-    $valid_avatars = [
-        'user-man-1.png',
-        'user-man-2.png',
-        'user-man-3.png',
-        'user-woman-1.png',
-        'user-woman-2.png',
-        'user-woman-3.png',
-    ];
-    $image_url = in_array($selected_avatar, $valid_avatars)
-        ? get_template_directory_uri() . '/assets/media/' . $selected_avatar
-        : get_template_directory_uri() . '/assets/media/' . $default_avatar;
-
-    // 4. Handle CV upload
-    // $cv_id = 0;
-    // if (!empty($_FILES['cv']['name'])) {
-    //     require_once ABSPATH . 'wp-admin/includes/file.php';
-    //     require_once ABSPATH . 'wp-admin/includes/media.php';
-    //     require_once ABSPATH . 'wp-admin/includes/image.php';
-
-    //     $uploaded_cv = media_handle_upload('cv', 0);
-
-    //     if (!is_wp_error($uploaded_cv)) {
-    //         if (!empty($candidate['cv'])) {
-    //             $old_cv_id = attachment_url_to_postid($candidate['cv']);
-    //             if ($old_cv_id) {
-    //                 wp_delete_attachment($old_cv_id, true);
-    //             }
-    //         }
-
-    //         $cv_id = $uploaded_cv;
-    //     } else {
-    //         $errors[] = 'CV upload failed.';
-    //     }
-    // }
-
-    // 5. Update DB
-    if (empty($errors)) {
-        $result = $wpdb->update(
-            "{$wpdb->prefix}candidates",
-            [
-                'status'          => $status,
-                'first_name'      => $first_name,
-                'last_name'       => $last_name,
-                'date_of_birth'   => $date_of_birth,
-                'country'         => $country,
-                'address'         => $address,
-                'city'            => $city,
-                'postal_code'     => $postal_code,
-                'phone'           => $phone,
-                'languages'       => $languages,
-                'education'       => $education,
-                'bio'             => $bio,
-                'specialization'  => $specialization,
-                'sub_role'        => $sub_role,
-                'experience'      => $experience,
-                'availability'    => $availability,
-                'sector'          => $sector,
-                'lang_tools'      => $lang_tools,
-                'image'           => $image_url,
-                'cv'              => !empty($cv_id) ? wp_get_attachment_url($cv_id) : $candidate['cv'],
-            ],
-            ['id' => $user_id],
-            null,
-            ['%d']
-        );
-
-        if ($result !== false) {
-            wp_redirect(add_query_arg('updated', '1', get_permalink()));
-            exit;
-        } else {
-            $form_message = 'No changes made.';
-            $form_message_type = 'error';
-        }
-    } else {
+    // If validation fails
+    if (!empty($errors)) {
         $form_message = implode('<br>', $errors);
         $form_message_type = 'error';
+    } else {
+        // Prepare sanitized/imploded values for DB
+        $languages_str = implode(', ', array_map('sanitize_text_field', $languages));
+        $lang_tools_str = implode(', ', array_map('sanitize_text_field', $lang_tools));
+
+        $selected_avatar = sanitize_text_field($_POST['selected_avatar'] ?? '');
+        $valid_avatars = [
+            'user-man-1.png',
+            'user-man-2.png',
+            'user-man-3.png',
+            'user-woman-1.png',
+            'user-woman-2.png',
+            'user-woman-3.png',
+        ];
+
+        if (in_array($selected_avatar, $valid_avatars)) {
+            $image_url = get_template_directory_uri() . '/assets/media/' . $selected_avatar;
+        } else {
+            $image_url = get_template_directory_uri() . '/assets/media/' . $default_avatar;
+        }
+
+        $data = [
+            'status' => $status,
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'date_of_birth' => $date_of_birth,
+            'country' => $country,
+            'address' => $address,
+            'city' => $city,
+            'postal_code' => $postal_code,
+            'phone' => $phone,
+            'languages' => $languages_str,
+            'education' => $education,
+            'bio' => $bio,
+            'specialization' => $specialization,
+            'sub_role' => $sub_role,
+            'experience' => $experience,
+            'availability' => $availability,
+            'sector' => $sector,
+            'lang_tools' => $lang_tools_str,
+            'image' => $image_url,
+        ];
+
+        $result = $wpdb->update("{$wpdb->prefix}candidates", $data, ['id' => $user_id]);
+
+        if ($result === false) {
+            error_log("MySQL Error: " . $wpdb->last_error);
+            $form_message = 'Database update failed. Please try again.';
+            $form_message_type = 'error';
+        } elseif ($result === 0) {
+            $form_message = 'No changes were detected in your submission.';
+            $form_message_type = 'warning';
+        } else {
+            wp_redirect(add_query_arg('updated', '1', get_permalink()));
+            exit;
+        }
     }
 }
 
@@ -214,15 +194,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                         <div class="row avatar-container">
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Image</label>
+                                    <label for="">Avatar</label>
                                     <div class="update-avatar">
-                                        <img src="<?php echo $image_url; ?>" alt="Profile Image" class="image">
+                                        <img src="<?php echo esc_url($image_url ?: get_template_directory_uri() . '/assets/media/user.png'); ?>"
+                                            alt="Profile Image" class="image">
                                     </div>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
-                                    <label for="">Select an avatar <span class="required">*</span></label>
+                                    <label for="">Select an avatar</label>
                                     <div class="avatar-selection">
                                         <?php
                                         $avatars = [
@@ -236,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
 
                                         foreach ($avatars as $avatar) {
                                             $avatar_url = get_template_directory_uri() . '/assets/media/' . $avatar;
-                                            $checked = (basename($candidate['image']) === $avatar) ? 'checked' : '';
+                                            $checked = (!empty($candidate['image']) && basename($candidate['image']) === $avatar) ? 'checked' : '';
                                             echo '
                                             <label class="avatar-option">
                                                 <input type="radio" name="selected_avatar" value="' . esc_attr($avatar) . '" ' . $checked . '>
@@ -257,6 +238,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     <input type="text" name="first_name" id="firstName"
                                         value="<?php echo esc_attr($current_user->first_name); ?>"
                                         placeholder="Enter your first name" required>
+                                    <?php if (!empty($errors['first_name'])): ?>
+                                    <p class="field-error"><?php echo esc_html($errors['first_name']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="col">
@@ -265,6 +249,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     <input type="text" name="last_name" id="lastName"
                                         value="<?php echo esc_attr($current_user->last_name); ?>"
                                         placeholder="Enter your last name" required>
+                                    <?php if (!empty($errors['last_name'])): ?>
+                                    <p class="field-error"><?php echo esc_html($errors['last_name']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -292,6 +279,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
                                     <input type="date" name="date_of_birth" id="dateOfBirth"
                                         value="<?php echo esc_attr($candidate['date_of_birth'] ?? ''); ?>" required>
+                                    <?php if (!empty($errors['date_of_birth'])): ?>
+                                    <p class="field-error"><?php echo esc_html($errors['date_of_birth']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="col">
@@ -299,6 +289,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     <label for="country">Country <span class="required">*</span></label>
                                     <input type="text" name="country" id="country" placeholder="Enter your country"
                                         required value="<?php echo esc_attr($candidate['country'] ?? ''); ?>">
+                                    <?php if (!empty($errors['country'])): ?>
+                                    <p class="field-error"><?php echo esc_html($errors['country']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -337,6 +330,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     <input type="text" name="phone" id="phone"
                                         value="<?php echo esc_attr($candidate['phone'] ?? ''); ?>"
                                         placeholder="Enter phone number" required>
+                                    <?php if (!empty($errors['phone'])): ?>
+                                    <p class="field-error"><?php echo esc_html($errors['phone']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -346,10 +342,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                 <div class="form-group">
                                     <label for="languages">Languages <span class="required">*</span></label>
                                     <select name="languages[]" id="languages" multiple required>
-                                        <option value="" disabled <?php selected(in_array($language,
-                                            $selected_languages), true, false); ?>>
-                                            Select
-                                            languages</option>
+                                        <option value="" disabled selected>Select languages</option>
                                         <?php
                                             $all_languages = [
                                                 'English', 'Dutch', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Russian', 'Chinese', 'Japanese',
@@ -369,12 +362,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     <label for="" style="color: var(--text-color)">(Hold CTRL for multiple
                                         selection)</label>
                                 </div>
+                                <?php if (!empty($errors['languages'])): ?>
+                                <p class="field-error"><?php echo esc_html($errors['languages']); ?></p>
+                                <?php endif; ?>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label for="education">Education <span class="required">*</span></label>
                                     <select name="education" id="education" required>
-                                        <option value="" disabled <?php selected($selected_education, '' ); ?>>Select
+                                        <option value="" disabled>Select
                                             education level</option>
                                         <option value="High School Diploma" <?php
                                             selected($selected_education, 'High School Diploma' ); ?>>High School
@@ -415,6 +411,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                         <option value="Other" <?php selected($selected_education, 'Other' ); ?>>Other
                                         </option>
                                     </select>
+                                    <?php if (!empty($errors['education'])): ?>
+                                    <p class="field-error"><?php echo esc_html($errors['education']); ?></p>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -423,25 +422,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                             <label for="bio">Bio <span class="required">*</span></label>
                             <textarea name="bio" id="bio"
                                 required><?php echo esc_textarea($candidate['bio'] ?? ''); ?></textarea>
+                            <?php if (!empty($errors['bio'])): ?>
+                            <p class="field-error"><?php echo esc_html($errors['bio']); ?></p>
+                            <?php endif; ?>
                         </div>
                     </div>
 
                     <div class="col technical-info">
                         <h3 class="form-heading">Technical Information</h3>
-
-                        <!-- <div class="form-group">
-                            <label for="">CV</label>
-                            <?php if ($cv_file_name && $cv_url): ?>
-                            <p class="current-cv">
-                                <?php echo esc_html($cv_file_name); ?> |
-                                <a href="<?php echo esc_url($cv_url); ?>" target="_blank">View</a>
-                            </p>
-                            <?php endif; ?>
-                            <input type="file" name="cv" id="cv" accept="application/pdf">
-                            <label for="cv" class="update-cv">Upload CV</label>
-                            <p class="cv-file-name" style="display: none;"></p>
-                            <small class="file-hint">Max 2MB. PDF only.</small>
-                        </div> -->
 
                         <div class="form-group">
                             <label for="specialization">Specialization <span class="required">*</span></label>
@@ -464,6 +452,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     selected($selected_specialization, 'Information Analyst' ); ?>>Information
                                     Analyst</option>
                             </select>
+                            <?php if (!empty($errors['specialization'])): ?>
+                            <p class="field-error"><?php echo esc_html($errors['specialization']); ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">
@@ -471,6 +462,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                             <select name="sub_role" id="subRole" required>
                                 <option value="" disabled selected>Select sub role</option>
                             </select>
+                            <?php if (!empty($errors['sub_role'])): ?>
+                            <p class="field-error"><?php echo esc_html($errors['sub_role']); ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">
@@ -489,6 +483,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     selected($selected_experience, 'Senior (6+ years)' ); ?>>Senior (6+ years)
                                 </option>
                             </select>
+                            <?php if (!empty($errors['experience'])): ?>
+                            <p class="field-error"><?php echo esc_html($errors['experience']); ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">
@@ -507,6 +504,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                 <option value="Internship" <?php selected($selected_availability, 'Internship' ); ?>>
                                     Internship</option>
                             </select>
+                            <?php if (!empty($errors['availability'])): ?>
+                            <p class="field-error"><?php echo esc_html($errors['availability']); ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">
@@ -540,6 +540,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                     selected($selected_sector, 'Other / Not Relevant' ); ?>>Other / Not Relevant
                                 </option>
                             </select>
+                            <?php if (!empty($errors['sector'])): ?>
+                            <p class="field-error"><?php echo esc_html($errors['sector']); ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <div class="form-group">
@@ -607,6 +610,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                             checked(in_array('Git', $checked_lang_tools)); ?>> Git</label>
                                 </div>
                             </div>
+                            <?php if (!empty($errors['lang_tools'])): ?>
+                            <p class="field-error"><?php echo esc_html($errors['lang_tools']); ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <div class="button-group">
@@ -660,41 +666,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-
-    // CV input handler — check if element exists first
-    // const cvInput = document.getElementById('cv');
-    // const cvFileNameDisplay = document.querySelector('.cv-file-name');
-
-    // if (cvInput && cvFileNameDisplay) {
-    //     cvInput.addEventListener('change', function() {
-    //         const file = cvInput.files[0];
-    //         if (!file) return;
-
-    //         const allowedType = 'application/pdf';
-    //         const maxSize = 2 * 1024 * 1024; // 2MB
-
-    //         if (file.type !== allowedType) {
-    //             showMessage('Only PDF files are allowed for CV.', 'error');
-    //             cvInput.value = '';
-    //             cvFileNameDisplay.textContent = '';
-    //             cvFileNameDisplay.style.display = 'none';
-    //             return;
-    //         }
-
-    //         if (file.size > maxSize) {
-    //             showMessage('CV must be smaller than 2MB.', 'error');
-    //             cvInput.value = '';
-    //             cvFileNameDisplay.textContent = '';
-    //             cvFileNameDisplay.style.display = 'none';
-    //             return;
-    //         }
-
-    //         cvFileNameDisplay.textContent = file.name;
-    //         cvFileNameDisplay.style.display = 'block';
-
-    //         showMessage('CV selected successfully.', 'success');
-    //     });
-    // }
 
     // Sub-role population
     const subrolesMap = {

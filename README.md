@@ -12,6 +12,12 @@
 
 ---
 
+### Version 1.0.2.1
+
+- **Fixed:** Profile update issue resolved by making avatar selection optional, increasing character limits for postal code, phone, languages, and bio fields in the database, and updating validation error messages on the frontend accordingly.
+
+---
+
 ### Version 1.0.2.0
 
 - **Fixed:** Profile status update issue on the registration page.
