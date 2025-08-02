@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
 
     // If validation fails
     if (!empty($errors)) {
-        $form_message = implode('<br>', $errors);
+        $form_message = implode(' | ', $errors);
         $form_message_type = 'error';
     } else {
         // Prepare sanitized/imploded values for DB
@@ -342,7 +342,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                 <div class="form-group">
                                     <label for="languages">Languages <span class="required">*</span></label>
                                     <select name="languages[]" id="languages" multiple required>
-                                        <option value="" disabled selected>Select languages</option>
                                         <?php
                                             $all_languages = [
                                                 'English', 'Dutch', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Russian', 'Chinese', 'Japanese',
@@ -370,7 +369,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['profile_update_nonce'
                                 <div class="form-group">
                                     <label for="education">Education <span class="required">*</span></label>
                                     <select name="education" id="education" required>
-                                        <option value="" disabled>Select
+                                        <option value="" disabled selected>Select
                                             education level</option>
                                         <option value="High School Diploma" <?php
                                             selected($selected_education, 'High School Diploma' ); ?>>High School
@@ -726,6 +725,113 @@ document.addEventListener('DOMContentLoaded', function() {
             populateSubRoles(this.value, '');
         });
     }
+});
+
+// JS validation before form submit
+document.addEventListener('DOMContentLoaded', function() {
+    const profileForm = document.querySelector('.profile-management-form');
+    const messageBox = document.querySelector('.form-message');
+
+    profileForm.addEventListener('submit', function(e) {
+        let hasError = false;
+        let errorMessages = [];
+
+        // Clear existing messages
+        messageBox.className = 'form-message';
+        messageBox.textContent = '';
+        messageBox.style.display = 'none';
+
+        // Check required fields
+        const requiredFields = [{
+                name: 'first_name',
+                label: 'First Name'
+            },
+            {
+                name: 'last_name',
+                label: 'Last Name'
+            },
+            {
+                name: 'date_of_birth',
+                label: 'Date of Birth'
+            },
+            {
+                name: 'country',
+                label: 'Country'
+            },
+            {
+                name: 'phone',
+                label: 'Phone'
+            },
+            {
+                name: 'education',
+                label: 'Education'
+            },
+            {
+                name: 'bio',
+                label: 'Bio'
+            },
+            {
+                name: 'specialization',
+                label: 'Specialization'
+            },
+            {
+                name: 'sub_role',
+                label: 'Sub-role'
+            },
+            {
+                name: 'experience',
+                label: 'Experience'
+            },
+            {
+                name: 'availability',
+                label: 'Availability'
+            },
+            {
+                name: 'sector',
+                label: 'Sector'
+            }
+        ];
+
+        // Loop through the required fields and check if they are empty
+        requiredFields.forEach(field => {
+            const el = profileForm.querySelector(`[name="${field.name}"]`);
+            if (el && !el.value.trim()) {
+                hasError = true;
+                errorMessages.push(`${field.label} is required.`);
+            }
+        });
+
+        // Check if at least one language is selected
+        const languages = profileForm.querySelector('[name="languages[]"]');
+        if (languages) {
+            const selectedLanguages = Array.from(languages.selectedOptions);
+            if (selectedLanguages.length === 0) {
+                hasError = true;
+                errorMessages.push('At least one language must be selected.');
+            }
+        }
+
+        // Check if at least one tool is selected from checkboxes (lang_tools[])
+        const toolCheckboxes = profileForm.querySelectorAll('[name="lang_tools[]"]');
+        const toolChecked = Array.from(toolCheckboxes).some(chk => chk.checked);
+        if (!toolChecked) {
+            hasError = true;
+            errorMessages.push('At least one language/tool must be selected.');
+        }
+
+        // If there are errors, stop form submission and show errors
+        if (hasError) {
+            e.preventDefault(); // Prevent form submission
+
+            messageBox.className = 'form-message error';
+            messageBox.innerHTML = errorMessages.join('<br>');
+            messageBox.style.display = 'block';
+            messageBox.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    });
 });
 </script>
 

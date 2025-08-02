@@ -166,9 +166,17 @@
   font-size: 14px;
   transition: all 0.3s ease-in-out;
 }
-#candidateProfile .form-message.error,
-#candidateProfile .field-error {
+#candidateProfile .form-message.error {
   background: rgb(255, 234, 234);
+}
+#candidateProfile .field-error {
+  color: crimson;
+  font-family: var(--acecnt-font-family);
+  font-weight: 500;
+  font-size: 14px;
+  border: solid 1px crimson;
+  border-radius: 5px;
+  padding: 10px 20px;
 }
 #candidateProfile .col.personal-info {
   flex: 2;
